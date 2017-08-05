@@ -5,16 +5,15 @@ use list::resolve;
 use functions::assert_length;
 use functions::assert_min_length;
 use functions::invalid_types;
-use scope:: Function;
 use value::Value;
+use lambda::Lambda;
 
-pub fn defun(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 3, "defun")?;
+pub fn lambda(list: &List, _stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    assert_length(list, 2, "lambda")?;
     let op_1 = list.cells().get(1).unwrap().clone();
     let op_2 = list.cells().get(2).unwrap().clone();
-    let op_3 = list.cells().get(3).unwrap().clone();
-    match (op_1, op_2, op_3) {
-        (Value::Word(name), Value::List(params), Value::List(value)) => {
+    match (op_1, op_2) {
+        (Value::List(params), Value::List(value)) => {
             let mut args = Vec::new();
             for param in params.cells() {
                 match param {
@@ -22,25 +21,15 @@ pub fn defun(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
                         args.push(param_str.clone());
                     },
                     _ => {
-                        return Err(Error::new(format!("'defun': only words can be used as function parameters.")));
+                        return Err(Error::new(format!("'lambda': only words can be used as function parameters.")));
                     }
                 }
             }
-            if stack.len() <= 1 {
-                return Err(Error::new(format!("'defun': no scope above the current one.")));
-            }
-            let index = stack.len() - 2;
-            if stack.get(index).unwrap().has_function(&name) {
-                return Err(Error::new(format!("'defun': a function with the name '{}' already exists.", name)));
-            }
-            let function = Function::new(args, value);
-            let result = stack.get_mut(index).unwrap().set_function(name, function);
-            if !result {
-                panic!("function already exists. this should have been checked.");
-            }
+            let lambda = Lambda::new(args, value);
+            return Ok(Value::new_lambda(lambda));
         },
-        (type_1, type_2, type_3) => {
-            invalid_types(vec!(&type_1, &type_2, &type_3), "defun")?;
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "lambda")?;
         }
     }
     Ok(Value::Nil)

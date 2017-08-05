@@ -15,8 +15,8 @@ use corelib::math::{
 use corelib::program::{
     set,
     prog,
-    defun,
-    quote
+    quote,
+    lambda
 };
 use corelib::listops::{
     first,
@@ -32,8 +32,8 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         }
     };
     let result = match &function[..] {
+        "lambda" => lambda(list, stack),
         "seq" => prog(list, stack),
-        "fn" => defun(list, stack),
         "set" => set(list, stack),
         "quote" => quote(list, stack),
         "add" => add(list, stack),

@@ -113,54 +113,28 @@ impl List {
             Some(value) => { //the function has a result without an error
                 retval = value;
             }, 
-            None => { //there is no builtin function with that name, look in the interpreters memory (in the scopes)
-                retval = call_function(&self.cells, stack)?;
+            None => { //there is no builtin function with that name, look for lambdas on the stack
+                let name = match self.cells.get(0).unwrap() {
+                    &Value::Word(ref name) => name,
+                    _ => return Err(Error::new(format!("expected function name as first list item.")))
+                };
+                let mut lambda = match resolve_variable(name, stack)? {
+                    Value::Lambda(lambda) => lambda,
+                    _ => return Err(Error::new(format!("unknown function '{}'.", name)))
+                };
+                let param_count = self.cells.len() - 1;
+                if param_count != lambda.param_count() {
+                    return Err(Error::new(format!("'{}': expected {} function parameters, found {}.", name, lambda.param_count(), param_count)));
+                }
+                let mut params = Vec::new();
+                for i in 1..self.cells.len() {
+                    params.push(self.cells.get(i).unwrap().clone());
+                }
+                retval = lambda.eval(params, stack)?;
             }
         };
         let _ = stack.pop(); //remove the scope of this function
         Ok(retval)
-    }
-}
-
-//TODO: review this, I was tired while writing this
-pub fn call_function(list_cells: &Vec<Value>, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    let mut counter = stack.len() - 1;
-    let fn_name = match list_cells.get(0).unwrap() {
-        &Value::Word(ref func) => func,
-        rest => {
-            return Err(Error::new(format!("expected function in the first cell, found {}.", rest.type_str())));
-        }
-    };
-    let mut func = None;
-    let mut params = Vec::new();
-    for i in 1..list_cells.len() {
-        params.push(list_cells.get(i).unwrap().clone());
-    }
-    loop {
-        let scope = stack.get(counter).unwrap();
-        let exists = scope.has_function(fn_name);
-        if exists {
-            let inner_func = scope.get_function(fn_name).unwrap().clone();
-            if params.len() == inner_func.param_count() {
-                func = Some(inner_func);
-                break;
-            }
-            else {
-                return Err(Error::new(format!("'{}': expected {} parameters, found {}.", fn_name, inner_func.param_count(), params.len())));
-            }
-        }
-        if counter == 0 {
-            break;
-        }
-        counter -= 1;
-    }
-    match func {
-        Some(mut f) => {
-            f.eval(params, stack)
-        },
-        None => {
-            Err(Error::new(format!("unknown function '{}'.", fn_name)))
-        }
     }
 }
 
@@ -177,19 +151,23 @@ pub fn resolve(val: Value, stack: &mut Vec<Scope>, fn_name: &'static str) -> Res
             }
         },
         Value::Word(word) => {
-            let mut counter = stack.len() - 1;
-            loop {
-                let scope = stack.get(counter).unwrap();
-                if scope.has_variable(&word) {
-                    return Ok(scope.get_variable(&word).unwrap().clone()); //TODO: Cloning large variables is bad
-                }
-                if counter == 0 {
-                    break;
-                }
-                counter -= 1;
-            }
-            Err(Error::new(format!("unknown variable '{}'.", word)))
+            resolve_variable(&word, stack)
         },
         rest => Ok(rest)
     }
+}
+
+fn resolve_variable(var: &String, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let mut counter = stack.len() - 1;
+    loop {
+        let scope = stack.get(counter).unwrap();
+        if scope.has_variable(&var) {
+            return Ok(scope.get_variable(&var).unwrap().clone()); //TODO: Cloning large variables is bad
+        }
+        if counter == 0 {
+            break;
+        }
+        counter -= 1;
+    }
+    Err(Error::new(format!("unknown variable '{}'.", var)))
 }

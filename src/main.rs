@@ -10,6 +10,7 @@ mod error;
 mod functions;
 mod scope;
 mod corelib;
+mod lambda;
 
 use interpreter::Interpreter;
 

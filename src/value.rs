@@ -3,6 +3,7 @@ use std::fmt::Result as FmtResult;
 use std::fmt::Formatter;
 
 use list::List;
+use lambda::Lambda;
 
 const NUMBER_CHARS: [char; 14] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '+', '-', 'e'];
 
@@ -12,7 +13,8 @@ pub enum Value {
     List(List),
     Float(f32),
     Integer(i32),
-    Word(String)
+    Word(String),
+    Lambda(Lambda)
 }
 
 impl Value {
@@ -55,13 +57,18 @@ impl Value {
         Value::List(list)
     }
 
+    pub fn new_lambda(lambda: Lambda) -> Value {
+        Value::Lambda(lambda)
+    }
+
     pub fn type_str(&self) -> &'static str {
         match *self {
             Value::Nil => "nil",
             Value::List(_) => "list",
             Value::Float(_) => "float",
             Value::Integer(_) => "integer",
-            Value::Word(_) => "word"
+            Value::Word(_) => "word",
+            Value::Lambda(_) => "lambda"
         }
     }
 }
@@ -70,7 +77,7 @@ impl Display for Value {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match self {
             &Value::Nil => {
-                write!(f, "[Nil]")
+                write!(f, "[nil]")
             },
             &Value::List(ref list) => {
                 let count = list.cells().len();
@@ -96,6 +103,9 @@ impl Display for Value {
             },
             &Value::Word(ref word) => {
                 write!(f, "{} [word]", word)
+            },
+            &Value::Lambda(_) => {
+                write!(f, "[lambda]")
             }
         }
     }
