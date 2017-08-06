@@ -1,16 +1,16 @@
 use list::List;
 use scope::Scope;
 use error::Error;
-use list::resolve;
-use functions::assert_length;
-use functions::invalid_types;
-use functions::to_float;
+use functions::{
+    resolve_argument,
+    resolve_two_arguments,
+    invalid_types,
+    to_float
+};
 use value::Value;
 
 pub fn add(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 2, "add")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "add")?;
-    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "add")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "add")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
             return Ok(Value::Integer(i_1 + i_2));
@@ -32,9 +32,7 @@ pub fn add(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn sub(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 2, "sub")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "sub")?;
-    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "sub")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "sub")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
             return Ok(Value::Integer(i_1 - i_2));
@@ -56,9 +54,7 @@ pub fn sub(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn mul(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 2, "mul")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "mul")?;
-    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "mul")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "mul")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
             return Ok(Value::Integer(i_1 * i_2));
@@ -80,9 +76,7 @@ pub fn mul(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn div(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 2, "div")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "div")?;
-    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "div")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "div")?;
     let val_1 = to_float(op_1);
     let val_2 = to_float(op_2);
     match (val_1, val_2) {
@@ -97,8 +91,7 @@ pub fn div(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn sin(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 1, "sin")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "sin")?;
+    let op_1 = resolve_argument(list, stack, "sin")?;
     let val_1 = to_float(op_1);
     match val_1 {
         Some(f) => {
@@ -112,8 +105,7 @@ pub fn sin(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn cos(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 1, "cos")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "cos")?;
+    let op_1 = resolve_argument(list, stack, "cos")?;    
     let val_1 = to_float(op_1);
     match val_1 {
         Some(f) => {
@@ -127,8 +119,7 @@ pub fn cos(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn tan(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 1, "tan")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "tan")?;
+    let op_1 = resolve_argument(list, stack, "tan")?;    
     let val_1 = to_float(op_1);
     match val_1 {
         Some(f) => {

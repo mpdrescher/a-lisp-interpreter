@@ -1,17 +1,12 @@
 use list::List;
 use scope::Scope;
 use error::Error;
-use list::resolve;
-use functions::assert_length;
-use functions::assert_min_length;
 use functions::invalid_types;
+use functions::resolve_two_arguments;
 use value::Value;
-use lambda::Lambda;
 
 pub fn eq(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 2, "eq")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "eq")?;
-    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "eq")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "eq")?;
     let is_equal = match (op_1, op_2) {
         (Value::Nil, Value::Nil) => true,
         //(Value::List(list), Value::List(list2)) => list == list2,

@@ -1,6 +1,4 @@
 use value::Value;
-use list::List;
-use error::Error;
 
 use std::collections::HashMap;
 
@@ -25,7 +23,6 @@ impl Scope {
     }
 
     pub fn set_variable(&mut self, name: String, value: Value) {
-        println!("Variable set: {}", name);
         self.vars.insert(name, value);
     }
 }

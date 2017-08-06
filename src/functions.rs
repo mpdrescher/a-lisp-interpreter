@@ -1,4 +1,5 @@
 use list::List;
+use list::resolve;
 use error::Error;
 use value::Value;
 use scope::Scope;
@@ -22,8 +23,8 @@ use corelib::program::{
 };
 use corelib::listops::{
     first,
-    last,
-    push
+    rest,
+    cons
 };
 use corelib::comp::{
     eq
@@ -50,8 +51,8 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "cos" => cos(list, stack),
         "tan" => tan(list, stack),
         "first" => first(list, stack),
-        "last" => last(list, stack),
-        "push" => push(list, stack),
+        "last" => rest(list, stack),
+        "push" => cons(list, stack),
         "cond" => cond(list, stack),
         "eq" => eq(list, stack),
         _ => {
@@ -75,6 +76,29 @@ pub fn invalid_types(types: Vec<&Value>, fn_name: &'static str) -> Result<(), Er
     }
     Err(Error::new(format!("invalid types in '{}': {}", fn_name, type_str)))
 }
+
+//might seem hacky, but is the only way I can use pattern matching
+pub fn resolve_argument(list: &List, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<Value, Error> {
+    assert_length(list, 1, fn_name)?;
+    Ok(resolve(list.cells().get(1).unwrap().clone(), stack, fn_name)?)
+}
+
+pub fn resolve_two_arguments(list: &List, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<(Value, Value), Error> {
+    assert_length(list, 2, fn_name)?;
+    Ok((
+        resolve(list.cells().get(1).unwrap().clone(), stack, fn_name)?,
+        resolve(list.cells().get(2).unwrap().clone(), stack, fn_name)?
+    ))
+}
+
+/*pub fn resolve_three_arguments(list: &List, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<(Value, Value, Value), Error> {
+    assert_length(list, 3, fn_name)?;
+    Ok((
+        resolve(list.cells().get(1).unwrap().clone(), stack, fn_name)?,
+        resolve(list.cells().get(2).unwrap().clone(), stack, fn_name)?,
+        resolve(list.cells().get(3).unwrap().clone(), stack, fn_name)?
+    ))
+}*/
 
 pub fn assert_min_length(list: &List, length: usize, fn_name: &'static str) -> Result<(), Error> {
     let len = list.cells().len() - 1;

@@ -5,13 +5,12 @@ use list::resolve;
 use functions::assert_length;
 use functions::assert_min_length;
 use functions::invalid_types;
+use functions::resolve_two_arguments;
 use value::Value;
 use lambda::Lambda;
 
 pub fn lambda(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 2, "lambda")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "lambda")?;
-    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "lambda")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "lambda")?;
     match (op_1, op_2) {
         (Value::List(params), Value::List(value)) => {
             let mut args = Vec::new();
@@ -21,7 +20,7 @@ pub fn lambda(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
                         args.push(param_str.clone());
                     },
                     _ => {
-                        return Err(Error::new(format!("'lambda': only words can be used as function parameters.")));
+                        return Err(Error::new(format!("'lambda': only symbols can be used as function parameters.")));
                     }
                 }
             }
@@ -72,9 +71,7 @@ pub fn prog(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn set(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 2, "set")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "set")?;
-    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "set")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "set")?;
     match (op_1, op_2) {
         (type_1, Value::Symbol(_)) => {
             invalid_types(vec!(&type_1, &Value::Symbol(String::new())), "set")?;
@@ -94,9 +91,7 @@ pub fn set(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn global(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 2, "global")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "global")?;
-    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "global")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "global")?;
     match (op_1, op_2) {
         (type_1, Value::Symbol(_)) => {
             invalid_types(vec!(&type_1, &Value::Symbol(String::new())), "global")?;

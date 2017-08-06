@@ -1,15 +1,13 @@
 use list::List;
 use scope::Scope;
 use error::Error;
-use list::resolve;
-use functions::assert_length;
-use functions::assert_min_length;
 use functions::invalid_types;
+use functions::resolve_argument;
+use functions::resolve_two_arguments;
 use value::Value;
 
 pub fn first(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 1, "first")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "first")?;
+    let op_1 = resolve_argument(list, stack, "first")?;
     match op_1 {
         Value::List(list) => {
             if list.cells().len() > 0 {
@@ -27,8 +25,7 @@ pub fn first(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn rest(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 1, "last")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "last")?;
+    let op_1 = resolve_argument(list, stack, "rest")?;
     match op_1 {
         Value::List(list) => {
             if list.cells().len() > 0 {
@@ -47,9 +44,7 @@ pub fn rest(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn cons(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 2, "push")?;
-    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "push")?;
-    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "push")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "cons")?;
     match (op_1, op_2) {
         (val, Value::List(mut list)) => {
             list.cells_mut().insert(0, val);
