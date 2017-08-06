@@ -26,7 +26,7 @@ pub fn first(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn last(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn rest(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     assert_length(list, 1, "last")?;
     let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "last")?;
     match op_1 {
@@ -46,7 +46,7 @@ pub fn last(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn push(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn cons(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     assert_length(list, 2, "push")?;
     let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "push")?;
     let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "push")?;

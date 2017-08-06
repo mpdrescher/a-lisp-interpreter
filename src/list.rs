@@ -8,7 +8,13 @@ pub struct List {
     cells: Vec<Value>
 }
 
-impl List {
+impl List { 
+    pub fn empty() -> List {
+        List {
+            cells: Vec::new()
+        }
+    }
+    
     pub fn cells(&self) -> &Vec<Value> {
         &self.cells
     }
@@ -29,7 +35,7 @@ impl List {
             };
             if ch == '(' {
                 if buffer.len() > 0 {
-                    cells.push(Value::from_string(buffer));
+                    push_to_cells(&mut cells, buffer, &mut quoted)?;
                     buffer = String::new();
                 }
                 let mut inner_buffer = String::new();
@@ -64,9 +70,6 @@ impl List {
                     cells.push(Value::new_list(List::from_string(inner_buffer)?));
                 }
             }
-            else if quoted {
-                return Err(Error::new(format!("expected a list after an apostrophe.")));
-            }
             else if ch == '\'' {
                 quoted = true;
             }
@@ -75,7 +78,7 @@ impl List {
             }
             else if ch.is_whitespace() {
                 if buffer.len() > 0 {
-                    cells.push(Value::from_string(buffer));
+                    push_to_cells(&mut cells, buffer, &mut quoted)?;
                     buffer = String::new();
                 }
             }
@@ -84,7 +87,7 @@ impl List {
             }
         }
         if buffer.len() > 0 {
-            cells.push(Value::from_string(buffer));
+            push_to_cells(&mut cells, buffer, &mut quoted)?;
         }
         Ok(List {
             cells: cells
@@ -113,10 +116,13 @@ impl List {
             Some(value) => { //the function has a result without an error
                 retval = value;
             }, 
-            None => { //there is no builtin function with that name, look for lambdas on the stack
+            None => { //there is no builtin function with that name, look for lambdas on the stack or execute the list
                 let name = match self.cells.get(0).unwrap() {
-                    &Value::Word(ref name) => name,
-                    _ => return Err(Error::new(format!("expected function name as first list item.")))
+                    &Value::Symbol(ref name) => name,
+                    &Value::List(ref list) => {
+                        return list.clone().eval(stack, None);
+                    },
+                    value => return Err(Error::new(format!("expected function name as first list item, found {}.", value.type_str())))
                 };
                 let mut lambda = match resolve_variable(name, stack)? {
                     Value::Lambda(lambda) => lambda,
@@ -128,7 +134,8 @@ impl List {
                 }
                 let mut params = Vec::new();
                 for i in 1..self.cells.len() {
-                    params.push(self.cells.get(i).unwrap().clone());
+                    let param = resolve(self.cells.get(i).unwrap().clone(), stack, "[eval]")?;
+                    params.push(param);
                 }
                 retval = lambda.eval(params, stack)?;
             }
@@ -138,6 +145,19 @@ impl List {
     }
 }
 
+//helper function to tokenize a list string
+fn push_to_cells(list: &mut Vec<Value>, buffer: String, quoted: &mut bool) -> Result<(), Error> {
+    if *quoted {
+        list.push(Value::List(List::from_string(format!("quote {}", buffer))?));
+        *quoted = false;
+    }
+    else {
+        list.push(Value::from_string(buffer));
+    }
+    Ok(())
+}
+
+//resolves the parameters a function gets
 pub fn resolve(val: Value, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<Value, Error> {
     match val {
         Value::List(mut list) => {
@@ -150,9 +170,12 @@ pub fn resolve(val: Value, stack: &mut Vec<Scope>, fn_name: &'static str) -> Res
                 }
             }
         },
-        Value::Word(word) => {
-            resolve_variable(&word, stack)
+        Value::Symbol(symbol) => {
+            resolve_variable(&symbol, stack)
         },
+        Value::Nil => {
+            return Ok(Value::List(List::empty()));
+        }
         rest => Ok(rest)
     }
 }

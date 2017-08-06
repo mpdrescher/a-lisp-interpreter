@@ -13,14 +13,21 @@ pub enum Value {
     List(List),
     Float(f32),
     Integer(i32),
-    Word(String),
-    Lambda(Lambda)
+    Symbol(String),
+    Lambda(Lambda),
+    Boolean(bool)
 }
 
 impl Value {
     pub fn from_string(code: String) -> Value {
         if code == "nil" {
             Value::Nil
+        }
+        else if code == "true" {
+            Value::Boolean(true)
+        }
+        else if code == "false" {
+            Value::Boolean(false)
         }
         else if is_numeric(&code) {
             let dot_count = code.chars().filter(|x| *x == '.').count();
@@ -30,7 +37,7 @@ impl Value {
                         Value::Float(float)
                     },
                     Err(_) => {
-                        Value::Word(code)
+                        Value::Symbol(code)
                     }
                 }
             }
@@ -40,16 +47,16 @@ impl Value {
                         Value::Integer(int)
                     },
                     Err(_) => {
-                        Value::Word(code)
+                        Value::Symbol(code)
                     }
                 }
             }
             else {
-                Value::Word(code)
+                Value::Symbol(code)
             }
         }
         else {
-            Value::Word(code)
+            Value::Symbol(code)
         }   
     }
 
@@ -67,8 +74,9 @@ impl Value {
             Value::List(_) => "list",
             Value::Float(_) => "float",
             Value::Integer(_) => "integer",
-            Value::Word(_) => "word",
-            Value::Lambda(_) => "lambda"
+            Value::Symbol(_) => "symbol",
+            Value::Lambda(_) => "lambda",
+            Value::Boolean(_) => "boolean"
         }
     }
 }
@@ -101,12 +109,15 @@ impl Display for Value {
             &Value::Integer(ref int) => {
                 write!(f, "{} [integer]", int)
             },
-            &Value::Word(ref word) => {
-                write!(f, "{} [word]", word)
+            &Value::Symbol(ref symbol) => {
+                write!(f, "{} [symbol]", symbol)
             },
             &Value::Lambda(_) => {
                 write!(f, "[lambda]")
-            }
+            },
+            &Value::Boolean(ref boolean) => {
+                write!(f, "{} [boolean]", boolean)
+            } 
         }
     }
 }

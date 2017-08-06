@@ -16,25 +16,31 @@ use corelib::program::{
     set,
     prog,
     quote,
-    lambda
+    lambda,
+    cond,
+    global
 };
 use corelib::listops::{
     first,
     last,
     push
 };
+use corelib::comp::{
+    eq
+};
 
 pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error> {
     let function = match list.cells().first().unwrap() { //unwrap, because eval checks for empty list
-        &Value::Word(ref func) => func,
-        rest => {
-            return Err(Error::new(format!("expected function in the first cell, found {}.", rest.type_str())))
+        &Value::Symbol(ref func) => func,
+        _ => {
+            return Ok(None);
         }
     };
     let result = match &function[..] {
         "lambda" => lambda(list, stack),
         "seq" => prog(list, stack),
         "set" => set(list, stack),
+        "global" => global(list, stack),
         "quote" => quote(list, stack),
         "add" => add(list, stack),
         "sub" | "-" => sub(list, stack),
@@ -46,6 +52,8 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "first" => first(list, stack),
         "last" => last(list, stack),
         "push" => push(list, stack),
+        "cond" => cond(list, stack),
+        "eq" => eq(list, stack),
         _ => {
             return Ok(None)
         }

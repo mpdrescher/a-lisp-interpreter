@@ -8,16 +8,16 @@ use functions::invalid_types;
 use value::Value;
 use lambda::Lambda;
 
-pub fn lambda(list: &List, _stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn lambda(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     assert_length(list, 2, "lambda")?;
-    let op_1 = list.cells().get(1).unwrap().clone();
-    let op_2 = list.cells().get(2).unwrap().clone();
+    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "lambda")?;
+    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "lambda")?;
     match (op_1, op_2) {
         (Value::List(params), Value::List(value)) => {
             let mut args = Vec::new();
             for param in params.cells() {
                 match param {
-                    &Value::Word(ref param_str) => {
+                    &Value::Symbol(ref param_str) => {
                         args.push(param_str.clone());
                     },
                     _ => {
@@ -35,6 +35,33 @@ pub fn lambda(list: &List, _stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
+pub fn cond(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    assert_min_length(list, 1, "cond")?;
+    for i in 1..list.cells().len() {
+        let cell = resolve(list.cells().get(i).unwrap().clone(), stack, "cond")?;
+        let inner_list = match cell {
+            Value::List(list) => list,
+            _ => {
+                return Err(Error::new(format!("'cond': expected a list instead of '{}' at index {}.", cell.type_str(), i - 1)));
+            }
+        };
+        if inner_list.cells().len() != 2 {
+            return Err(Error::new(format!("'cond': expected a list with two elements at index {}, found one with {}.", i - 1, inner_list.cells().len())));
+        }
+        let condition_value = resolve(inner_list.cells().get(0).unwrap().clone(), stack, "cond")?;
+        let condition = match condition_value {
+            Value::Boolean(boolean) => boolean,
+            _ => {
+                return Err(Error::new(format!("'cond': expected a boolean as the first element at index {}", i - 1)));
+            }
+        };
+        if condition {
+            return Ok(resolve(inner_list.cells().get(1).unwrap().clone(), stack, "cond")?);
+        }
+    }
+    Err(Error::new(format!("'cond': no condition was true.")))
+}
+
 pub fn prog(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     assert_min_length(list, 2, "prog")?;
     let mut retval = Value::Nil;
@@ -46,13 +73,13 @@ pub fn prog(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 
 pub fn set(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     assert_length(list, 2, "set")?;
-    let op_1 = list.cells().get(1).unwrap().clone();
+    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "set")?;
     let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "set")?;
     match (op_1, op_2) {
-        (type_1, Value::Word(_)) => {
-            invalid_types(vec!(&type_1, &Value::Word(String::new())), "set")?;
+        (type_1, Value::Symbol(_)) => {
+            invalid_types(vec!(&type_1, &Value::Symbol(String::new())), "set")?;
         },
-        (Value::Word(name), value) => {
+        (Value::Symbol(name), value) => {
             if stack.len() <= 1 {
                 return Err(Error::new(format!("'set': no scope above the current one.")));
             }
@@ -61,6 +88,27 @@ pub fn set(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
         },
         (type_1, type_2) => {
             invalid_types(vec!(&type_1, &type_2), "set")?;
+        }
+    };
+    Ok(Value::Nil)
+}
+
+pub fn global(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    assert_length(list, 2, "global")?;
+    let op_1 = resolve(list.cells().get(1).unwrap().clone(), stack, "global")?;
+    let op_2 = resolve(list.cells().get(2).unwrap().clone(), stack, "global")?;
+    match (op_1, op_2) {
+        (type_1, Value::Symbol(_)) => {
+            invalid_types(vec!(&type_1, &Value::Symbol(String::new())), "global")?;
+        },
+        (Value::Symbol(name), value) => {
+            if stack.len() == 0 {
+                return Err(Error::new(format!("'global': no scope found.")));
+            }
+            stack.get_mut(0).unwrap().set_variable(name, value);
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "global")?;
         }
     };
     Ok(Value::Nil)
