@@ -3,5 +3,13 @@ name = "a-lisp-interpreter"
 version = "0.1.0"
 authors = ["Matthias Drescher <matthias_p_drescher@t-online.de>"]
 
+[lib]
+name = "alisplib"
+path = "lib/lib.rs"
+
+[[bin]]
+name = "ali"
+path = "src/main.rs"
+
 [dependencies]
 rustyline = "*"

@@ -108,10 +108,11 @@ impl List {
                 stack.push(Scope::new()); //create a new empty scope for this function
             }
         }
-        if self.cells.len() == 0 {
-            return Ok(Value::Nil)
-        }
         let mut retval = Value::Nil;
+        if self.cells.len() == 0 {
+            let _ = stack.pop();
+            return Ok(retval)
+        }
         match functions::eval(&self, stack)? {
             Some(value) => { //the function has a result without an error
                 retval = value;

@@ -1,18 +1,10 @@
 extern crate rustyline;
+extern crate alisplib;
 
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
-mod interpreter;
-mod value;
-mod list;
-mod error;
-mod functions;
-mod scope;
-mod corelib;
-mod lambda;
-
-use interpreter::Interpreter;
+use alisplib::interpreter::Interpreter;
 
 fn main() {
     let mut rl = Editor::<()>::new();
@@ -62,15 +54,15 @@ fn unwrap_readline(line: Result<String, ReadlineError>) -> (String, bool) {
             (line, false)
         },
         Err(ReadlineError::Interrupted) => {
-            println!("\n[Interrupted]");
+            println!("\n    [Interrupted]\n");
             (empty, true)
         },
         Err(ReadlineError::Eof) => {
-            println!("\n[EOF]");
+            println!("\n    [EOF]\n");
             (empty, true)
         },
         Err(err) => {
-            println!("\nError: {:?}", err);
+            println!("\n    Error: {:?}\n", err);
             (empty, true)
         }
     }

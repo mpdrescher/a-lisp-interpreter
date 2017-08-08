@@ -6,6 +6,7 @@ use functions::assert_length;
 use functions::assert_min_length;
 use functions::invalid_types;
 use functions::resolve_two_arguments;
+use functions::resolve_argument;
 use value::Value;
 use lambda::Lambda;
 
@@ -112,4 +113,11 @@ pub fn global(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 pub fn quote(list: &List, _stack: &mut Vec<Scope>) -> Result<Value, Error> {
     assert_length(list, 1, "quote")?;
     Ok(list.cells().get(1).unwrap().clone())
+}
+
+pub fn print(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    assert_length(list, 1, "print")?;
+    let op_1 = resolve_argument(list, stack, "global")?;
+    println!("{}", op_1);
+    Ok(Value::Nil)
 }
