@@ -23,8 +23,12 @@ use corelib::program::{
 };
 use corelib::listops::{
     first,
-    rest,
-    cons
+    last,
+    init,
+    tail,
+    cons,
+    len,
+    nth
 };
 use corelib::comp::{
     eq
@@ -51,7 +55,11 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "cos" => cos(list, stack),
         "tan" => tan(list, stack),
         "first" => first(list, stack),
-        "last" => rest(list, stack),
+        "last" => last(list, stack),
+        "init" => init(list, stack),
+        "tail" => tail(list, stack),
+        "len" => len(list, stack),
+        "nth" => nth(list, stack),
         "push" => cons(list, stack),
         "cond" => cond(list, stack),
         "eq" => eq(list, stack),

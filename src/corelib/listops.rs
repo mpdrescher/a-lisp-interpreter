@@ -24,8 +24,8 @@ pub fn first(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn rest(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    let op_1 = resolve_argument(list, stack, "rest")?;
+pub fn last(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "last")?;
     match op_1 {
         Value::List(list) => {
             if list.cells().len() > 0 {
@@ -38,6 +38,77 @@ pub fn rest(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
         },
         type_1 => {
             invalid_types(vec!(&type_1), "last")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn init(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "init")?;
+    match op_1 {
+        Value::List(mut list) => {
+            if list.cells().len() > 0 {
+                let len = list.cells().len();
+                list.cells_mut().remove(len - 1);
+                return Ok(Value::List(list));
+            }
+            else {
+                return Ok(Value::Nil);
+            }
+        },
+        type_1 => {
+            invalid_types(vec!(&type_1), "init")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn tail(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "tail")?;
+    match op_1 {
+        Value::List(mut list) => {
+            if list.cells().len() > 0 {
+                list.cells_mut().remove(0);
+                return Ok(Value::List(list));
+            }
+            else {
+                return Ok(Value::Nil);
+            }
+        },
+        type_1 => {
+            invalid_types(vec!(&type_1), "tail")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn len(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "len")?;
+    match op_1 {
+        Value::List(list) => {
+            return Ok(Value::Integer(list.cells().len() as i32));
+        },
+        type_1 => {
+            invalid_types(vec!(&type_1), "len")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn nth(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "nth")?;
+    match (op_1, op_2) {
+        (Value::Integer(index), Value::List(list)) => {
+            if index < 0 {
+                return Err(Error::new(format!("'nth': index must be non-negative.")));
+            }
+            else if list.cells().len() == 0 || index >= list.cells().len() as i32 { //TODO: rethink this
+                return Ok(Value::Nil);
+            }
+            return Ok(list.cells().get(index as usize).unwrap().clone());
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "nth")?;
         }
     }
     Ok(Value::Nil)
