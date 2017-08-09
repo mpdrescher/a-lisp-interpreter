@@ -6,7 +6,32 @@ use rustyline::Editor;
 
 use alisplib::interpreter::Interpreter;
 
+use std::env;
+use std::io::Result as IOResult;
+
 fn main() {
+    let args = env::args().skip(1).collect::<Vec<String>>();
+    if args.len() == 0 {
+        start_interactive();
+    }
+    else {
+        for file in args {
+            match start_script(file) {
+                Ok(_) => {},
+                Err(e) => {
+                    println!("file error: {}", e);
+                }
+            }
+        }
+    }
+}
+
+fn start_script(path: String) -> IOResult<()> {
+    let mut interpreter = Interpreter::new();
+    interpreter.load_script(path)
+}
+
+fn start_interactive() {
     let mut rl = Editor::<()>::new();
     let mut interpreter = Interpreter::new();
     println!("== A Lisp Interpreter ==");

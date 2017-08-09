@@ -19,7 +19,7 @@ use corelib::program::{
     quote,
     lambda,
     cond,
-    print,
+    printfmt,
     global
 };
 use corelib::listops::{
@@ -63,7 +63,7 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "nth" => nth(list, stack),
         "cons" => cons(list, stack),
         "cond" => cond(list, stack),
-        "print" => print(list, stack),
+        "printfmt" => printfmt(list, stack),
         "eq" => eq(list, stack),
         _ => {
             return Ok(None)

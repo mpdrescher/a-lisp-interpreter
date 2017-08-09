@@ -115,9 +115,9 @@ pub fn quote(list: &List, _stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(list.cells().get(1).unwrap().clone())
 }
 
-pub fn print(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 1, "print")?;
-    let op_1 = resolve_argument(list, stack, "global")?;
+pub fn printfmt(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    assert_length(list, 1, "printfmt")?;
+    let op_1 = resolve_argument(list, stack, "printfmt")?;
     println!("{}", op_1);
     Ok(Value::Nil)
 }
