@@ -24,4 +24,4 @@ pub fn eq(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Boolean(is_equal))
 }
 
-//TODO lt, gt, le, ge, ne
+//TODO: lt, gt, le, ge, ne

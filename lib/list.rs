@@ -156,6 +156,10 @@ impl List {
                         }
                         else { 
                             //evaluate the inner list, append the following items, and evaluate that list
+                            //a future change might implement binding values to lambdas similar to
+                            //javascripts bind or haskells currying
+                            //this would include making the standard functions lambda-like:
+                            // -> fold (*) (1 2 3) = 6
                             let first_elem = list.clone().eval(stack, None)?;
                             let mut temp_cells = vec!(first_elem);
                             for elem in cell_iter { //append remaining

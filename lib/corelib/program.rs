@@ -62,11 +62,11 @@ pub fn cond(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Err(Error::new(format!("'cond': no condition was true.")))
 }
 
-pub fn prog(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_min_length(list, 2, "prog")?;
+pub fn seq(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    assert_min_length(list, 2, "seq")?;
     let mut retval = Value::Nil;
     for i in 1..list.cells().len() {
-        retval = resolve(list.cells().get(i).unwrap().clone(), stack, "prog")?;
+        retval = resolve(list.cells().get(i).unwrap().clone(), stack, "seq")?;
     }
     Ok(retval)
 }
@@ -127,4 +127,4 @@ pub fn print(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-//TODO: function 'try'
+//TODO: function 'try' which catches errors and returns a value, like rusts .unwrap_or

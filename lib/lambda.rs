@@ -23,6 +23,11 @@ impl Lambda {
     }
 
     pub fn eval(&mut self, params: Vec<Value>, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+        let expected_len = self.param_names.len();
+        let found_len = params.len();
+        if expected_len != found_len {
+            return Err(Error::new(format!("'lambda': expected {} parameters, found {}.", expected_len, found_len)));
+        }
         let param_vec = self.param_names.clone().into_iter().zip(params).collect::<Vec<(String, Value)>>();
         self.body.eval(stack, Some(param_vec))
     }

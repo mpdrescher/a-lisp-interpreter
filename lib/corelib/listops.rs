@@ -128,8 +128,11 @@ pub fn cons(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-//TODO: add function 'shape' which gives the nested size of a nested list
+//TODO: add function 'shape' which gives the nested size of a nested list like apls shape
 //TODO: add function 'splitat'
+//TODO: add function 'split'
+
+//TODO: add error trace to an error when a lamdba fails
 
 pub fn map(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "map")?;
@@ -149,7 +152,7 @@ pub fn map(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn fold(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    let (op_1, op_2) = resolve_two_arguments(list, stack, "map")?;
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "fold")?;
     match (op_1, op_2) {
         (Value::Lambda(mut lambda), Value::List(list)) => {
             let mut acc;
@@ -164,7 +167,7 @@ pub fn fold(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
             return Ok(acc);
         },
         (type_1, type_2) => {
-            invalid_types(vec!(&type_1, &type_2), "map")?;
+            invalid_types(vec!(&type_1, &type_2), "fold")?;
         }
     }
     Ok(Value::Nil)
