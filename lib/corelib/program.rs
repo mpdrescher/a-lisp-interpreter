@@ -126,3 +126,5 @@ pub fn print(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     println!("{}", op_1);
     Ok(Value::Nil)
 }
+
+//TODO: function 'try'

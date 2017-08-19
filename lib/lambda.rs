@@ -25,4 +25,6 @@ impl Lambda {
         let param_vec = self.param_names.clone().into_iter().zip(params).collect::<Vec<(String, Value)>>();
         self.body.eval(stack, Some(param_vec))
     }
+
+    //TODO: from_string
 }

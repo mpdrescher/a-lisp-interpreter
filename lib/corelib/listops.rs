@@ -170,7 +170,68 @@ pub fn fold(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
+pub fn any(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "any")?;
+    match (op_1, op_2) {
+        (Value::Lambda(mut lambda), Value::List(list)) => {
+            let mut result = false;
+            let mut index_counter = 0;
+            for elem in list.into_cells().into_iter() {
+                let elem_result = lambda.eval(vec!(elem), stack)?;
+                match elem_result {
+                    Value::Boolean(true) => {
+                        result = true;
+                    },
+                    Value::Boolean(false) => {},
+                    _ => {
+                        return Err(Error::new(format!("'any': expected boolean at index {}.", index_counter)));
+                    }
+                }
+                index_counter += 1;
+            }
+            return Ok(Value::Boolean(result));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "any")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn all(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "all")?;
+    match (op_1, op_2) {
+        (Value::Lambda(mut lambda), Value::List(list)) => {
+            let mut result = true;
+            if list.cells().len() == 0 {
+                return Ok(Value::Boolean(false));
+            }
+            let mut index_counter = 0;
+            for elem in list.into_cells().into_iter() {
+                let elem_result = lambda.eval(vec!(elem), stack)?;
+                match elem_result {
+                    Value::Boolean(false) => {
+                        result = false;
+                    },
+                    Value::Boolean(true) => {},
+                    _ => {
+                        return Err(Error::new(format!("'all': expected boolean at index {}.", index_counter)));
+                    }
+                }
+                index_counter += 1;
+            }
+            return Ok(Value::Boolean(result));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "all")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+//TODO: function zip
 //TODO: function 'any'
 //TODO: function 'all'
 //TODO: function 'filter'
 //TODO: function 'rev'
+//TODO: function 'expand'

@@ -32,7 +32,9 @@ use corelib::listops::{
     len,
     nth,
     map,
-    fold
+    fold,
+    any,
+    all
 };
 use corelib::comp::{
     eq
@@ -51,9 +53,9 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "set" => set(list, stack),
         "global" => global(list, stack),
         "quote" => quote(list, stack),
-        "add" => add(list, stack),
+        "add" | "+" => add(list, stack),
         "sub" | "-" => sub(list, stack),
-        "mul" => mul(list, stack),
+        "mul" | "*" => mul(list, stack),
         "div" | "/" => div(list, stack),
         "sin" => sin(list, stack),
         "cos" => cos(list, stack),
@@ -68,9 +70,11 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "cond" => cond(list, stack),
         "printfmt" => printfmt(list, stack),
         "print" => print(list, stack),
-        "eq" => eq(list, stack),
-        "map" => map(list, stack),
-        "fold" => fold(list, stack),
+        "eq" | "=" => eq(list, stack),
+        "map" | "%" => map(list, stack),
+        "fold" | "\\" => fold(list, stack),
+        "any" => any(list, stack),
+        "all" => all(list, stack),
         _ => {
             return Ok(None)
         }
