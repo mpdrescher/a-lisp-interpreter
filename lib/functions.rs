@@ -30,7 +30,9 @@ use corelib::listops::{
     tail,
     cons,
     len,
-    nth
+    nth,
+    map,
+    fold
 };
 use corelib::comp::{
     eq
@@ -67,6 +69,8 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "printfmt" => printfmt(list, stack),
         "print" => print(list, stack),
         "eq" => eq(list, stack),
+        "map" => map(list, stack),
+        "fold" => fold(list, stack),
         _ => {
             return Ok(None)
         }

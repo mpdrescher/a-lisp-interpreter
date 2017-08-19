@@ -23,6 +23,16 @@ impl List {
         &mut self.cells
     }
 
+    pub fn into_cells(self) -> Vec<Value> {
+        self.cells
+    }
+
+    pub fn new_with_cells(cells: Vec<Value>) -> List {
+        List {
+            cells: cells
+        }
+    }
+
     pub fn from_string(code: String) -> Result<List, Error> {
         let mut cells = Vec::new();
         let mut buffer = String::new();

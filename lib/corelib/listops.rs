@@ -134,8 +134,12 @@ pub fn cons(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 pub fn map(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "map")?;
     match (op_1, op_2) {
-        (Value::Lambda(lambda), Value::List(mut list)) => {
-
+        (Value::Lambda(mut lambda), Value::List(list)) => {
+            let mut result = Vec::new();
+            for value in list.into_cells().into_iter() {
+                result.push(lambda.eval(vec!(value), stack)?);
+            }
+            return Ok(Value::List(List::new_with_cells(result)));
         },
         (type_1, type_2) => {
             invalid_types(vec!(&type_1, &type_2), "map")?;
@@ -144,11 +148,20 @@ pub fn map(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn fold() -> Result<Value, Error> {
+pub fn fold(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "map")?;
     match (op_1, op_2) {
-        (Value::Lambda(lambda), Value::List(mut list)) => {
-
+        (Value::Lambda(mut lambda), Value::List(list)) => {
+            let mut acc;
+            if list.cells().len() == 0 {
+                return Ok(Value::Nil);
+            }
+            let mut list_iter = list.into_cells().into_iter();
+            acc = list_iter.next().unwrap();
+            for elem in list_iter {
+                acc = lambda.eval(vec!(acc, elem), stack)?;
+            }
+            return Ok(acc);
         },
         (type_1, type_2) => {
             invalid_types(vec!(&type_1, &type_2), "map")?;
@@ -159,3 +172,5 @@ pub fn fold() -> Result<Value, Error> {
 
 //TODO: function 'any'
 //TODO: function 'all'
+//TODO: function 'filter'
+//TODO: function 'rev'
