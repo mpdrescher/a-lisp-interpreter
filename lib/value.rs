@@ -1,4 +1,7 @@
-use std::fmt::Display;
+use std::fmt::{
+    Display,
+    Debug
+};
 use std::fmt::Result as FmtResult;
 use std::fmt::Formatter;
 
@@ -7,7 +10,7 @@ use lambda::Lambda;
 
 const NUMBER_CHARS: [char; 14] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '+', '-', 'e'];
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum Value {
     Nil,
     List(List),
@@ -81,7 +84,7 @@ impl Value {
     }
 }
 
-impl Display for Value {
+impl Debug for Value {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match self {
             &Value::Nil => {
@@ -95,10 +98,10 @@ impl Display for Value {
                 else {
                     let mut buffer = String::new();
                     buffer.push('{');
-                    for i in 0..count-1 {
-                        buffer.push_str(&format!("{}, ", list.cells().get(i).unwrap()));
+                    for i in 0..count - 1 {
+                        buffer.push_str(&format!("{:?}, ", list.cells().get(i).unwrap()));
                     }
-                    buffer.push_str(&format!("{}}} [list]", list.cells().get(count-1).unwrap()));
+                    buffer.push_str(&format!("{:?}}} [list]", list.cells().get(count-1).unwrap()));
                     buffer
                 };
                 write!(f, "{}", result)
@@ -118,6 +121,47 @@ impl Display for Value {
             &Value::Boolean(ref boolean) => {
                 write!(f, "{} [boolean]", boolean)
             } 
+        }
+    }
+}
+
+impl Display for Value {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        match self {
+            &Value::Nil => {
+                write!(f, "[nil]")
+            },
+            &Value::List(ref list) => {
+                let count = list.cells().len();
+                let result = if count == 0 {
+                    format!("{{}}")
+                }
+                else {
+                    let mut buffer = String::new();
+                    buffer.push('{');
+                    for i in 0..count - 1 {
+                        buffer.push_str(&format!("{}, ", list.cells().get(i).unwrap()));
+                    }
+                    buffer.push_str(&format!("{}}}", list.cells().get(count-1).unwrap()));
+                    buffer
+                };
+                write!(f, "{}", result)
+            },
+            &Value::Float(ref float) => {
+                write!(f, "{}", float)
+            },
+            &Value::Integer(ref int) => {
+                write!(f, "{}", int)
+            },
+            &Value::Symbol(ref symbol) => {
+                write!(f, "{}", symbol)
+            },
+            &Value::Lambda(_) => {
+                write!(f, "[lambda]")
+            },
+            &Value::Boolean(ref boolean) => {
+                write!(f, "{}", boolean)
+            }
         }
     }
 }

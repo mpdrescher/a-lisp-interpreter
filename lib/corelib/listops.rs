@@ -127,3 +127,35 @@ pub fn cons(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     }
     Ok(Value::Nil)
 }
+
+//TODO: add function 'shape' which gives the nested size of a nested list
+//TODO: add function 'splitat'
+
+pub fn map(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "map")?;
+    match (op_1, op_2) {
+        (Value::Lambda(lambda), Value::List(mut list)) => {
+
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "map")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn fold() -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "map")?;
+    match (op_1, op_2) {
+        (Value::Lambda(lambda), Value::List(mut list)) => {
+
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "map")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+//TODO: function 'any'
+//TODO: function 'all'

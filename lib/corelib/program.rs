@@ -116,8 +116,13 @@ pub fn quote(list: &List, _stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn printfmt(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    assert_length(list, 1, "printfmt")?;
     let op_1 = resolve_argument(list, stack, "printfmt")?;
+    println!("{:?}", op_1);
+    Ok(Value::Nil)
+}
+
+pub fn print(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "print")?;
     println!("{}", op_1);
     Ok(Value::Nil)
 }
