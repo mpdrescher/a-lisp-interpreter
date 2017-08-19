@@ -37,7 +37,12 @@ use corelib::listops::{
     all
 };
 use corelib::comp::{
-    eq
+    eq,
+    ne,
+    lt,
+    gt,
+    le,
+    ge
 };
 
 pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error> {
@@ -71,6 +76,11 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "printfmt" => printfmt(list, stack),
         "print" => print(list, stack),
         "eq" | "=" => eq(list, stack),
+        "ne" | "!=" => ne(list, stack),
+        "lt" | "<" => lt(list, stack),
+        "gt" | ">" => gt(list, stack),
+        "le" | "<=" => le(list, stack),
+        "ge" | ">=" => ge(list, stack),
         "map" | "%" => map(list, stack),
         "fold" | "\\" => fold(list, stack),
         "any" => any(list, stack),
