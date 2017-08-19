@@ -1,28 +1,28 @@
-Function Name;Alias;Dynamic Parameters;Param1;Param2;Param3;Returns;Errors;Description;Example
-lambda;;no;list;list;;lambda;;returns a lambda. the parameters are given in param1 and the lambda body is given in param2;(lambda '(x) '(add x 2)) -> returns a lambda, that adds two to a value
-seq;;yes;*;*;*;any;;evaluates the parameters in the order they were given. returns the last value;
-set;;no;symbol;any;;nil;;sets a variable with the given symbol as the name in the scope above the 'set';
-global;;no;symbol;any;;nil;;sets a variable with the given symbol as the name in the global scope;
-quote;;no;any;;;any;;prevents evaluation of the given value;(quote (add 2 3)) = (add [symbol] 2 [int] 3 [int])
-add;+;no;int/float;int/float;;int/float;;adds the two values;
-sub;-;no;int/float;int/float;;int/float;;subtracts param2 from param1;
-mul;*;no;int/float;int/float;;int/float;;multiplicates param1 with param2;
-div;/;no;int/float;int/float;;int/float;;divides param1 by param2;
-sin;;no;int/float;;;int/float;;returns the sine of the value;
-cos;;no;int/float;;;int/float;;returns the cosine of the value;
-tan;;no;int/float;;;int/float;;returns the tangent of the value;
-first;;no;list;;;any or nil;;returns the first value of the list;
-last;;no;list;;;any or nil;;returns the last value of the list;
-init;;no;list;;;list or nil;;returns the list with the last value removed;
-tail;;no;list;;;list or nil;;returns the list with the first value removed;
-len;;no;list;;;int;;returns the length of the list;
-nth;;no;int;list;;any or nil;;returns the value of param2 at index param1;
-cons;;no;any;list;;list;when the index is a negative number;pushes the value of param1 to the start of the list (index 0).;
-cond;;yes;*;*;*;any;no first element of a list evaluated to true;takes 1+ lists with two elements: boolean and any. returns the first any where boolean is true;
-printfmt;;no;any;;;nil;;prints out the value of the parameter with type annotation;
-print;;no;any;;;nil;;prints out the value;
-eq;=;no;any (TODO);any (TODO);;boolean;on type inequality;checks for equality;(eq 1 2) = false
-map;%;no;lambda;list;;list;;evaluates the lambda for every element of the list;(map (|x| add x 2) '(1 2 3)) = (3 4 5)
-fold;\;no;lambda;list;;any;;folds the elements of the list using the lambda.;(fold (|x y| add x y) '(1 2 3)) = (add 1 (add 2 (3))) = 6
-any;;no;lambda;list;;boolean;when lambda does not return a boolean;checks if any element in the list meets the conditions defined by the lambda;(any (|x| eq x 2) '(1 2 3)) = true
-all;;no;lambda;list;;boolean;when lambda does not return a boolean;checks if all elements in the list meet the condition defined by the lambda;(all (|x| eq x 2) '(1 2 3)) = false
+Function Name,Alias,Dynamic Parameters,Param1,Param2,Param3,Returns,Errors,Description,Example
+lambda,,no,list,list,,lambda,,returns a lambda. the parameters are given in param1 and the lambda body is given in param2,(lambda '(x) '(add x 2)) -> returns a lambda; that adds two to a value
+seq,,yes,*,*,*,any,,evaluates the parameters in the order they were given. returns the last value,
+set,,no,symbol,any,,nil,,sets a variable with the given symbol as the name in the scope above the 'set',
+global,,no,symbol,any,,nil,,sets a variable with the given symbol as the name in the global scope,
+quote,,no,any,,,any,,prevents evaluation of the given value,(quote (add 2 3)) = (add [symbol] 2 [int] 3 [int])
+add,+,no,int/float,int/float,,int/float,,adds the two values,
+sub,-,no,int/float,int/float,,int/float,,subtracts param2 from param1,
+mul,*,no,int/float,int/float,,int/float,,multiplicates param1 with param2,
+div,/,no,int/float,int/float,,int/float,,divides param1 by param2,
+sin,,no,int/float,,,int/float,,returns the sine of the value,
+cos,,no,int/float,,,int/float,,returns the cosine of the value,
+tan,,no,int/float,,,int/float,,returns the tangent of the value,
+first,,no,list,,,any or nil,,returns the first value of the list,
+last,,no,list,,,any or nil,,returns the last value of the list,
+init,,no,list,,,list or nil,,returns the list with the last value removed,
+tail,,no,list,,,list or nil,,returns the list with the first value removed,
+len,,no,list,,,int,,returns the length of the list,
+nth,,no,int,list,,any or nil,,returns the value of param2 at index param1,
+cons,,no,any,list,,list,when the index is a negative number,pushes the value of param1 to the start of the list (index 0).,
+cond,,yes,*,*,*,any,no first element of a list evaluated to true,takes 1+ lists with two elements: boolean and any. returns the first any where boolean is true,
+printfmt,,no,any,,,nil,,prints out the value of the parameter with type annotation,
+print,,no,any,,,nil,,prints out the value,
+eq,=,no,any (TODO),any (TODO),,boolean,on type inequality,checks for equality,(eq 1 2) = false
+map,%,no,lambda,list,,list,,evaluates the lambda for every element of the list,(map (|x| add x 2) '(1 2 3)) = (3 4 5)
+fold,\,no,lambda,list,,any,,folds the elements of the list using the lambda.,(fold (|x y| add x y) '(1 2 3)) = (add 1 (add 2 (3))) = 6
+any,,no,lambda,list,,boolean,when lambda does not return a boolean,checks if any element in the list meets the conditions defined by the lambda,(any (|x| eq x 2) '(1 2 3)) = true
+all,,no,lambda,list,,boolean,when lambda does not return a boolean,checks if all elements in the list meet the condition defined by the lambda,(all (|x| eq x 2) '(1 2 3)) = false
