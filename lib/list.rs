@@ -2,6 +2,7 @@ use error::Error;
 use value::Value;
 use functions;
 use scope::Scope;
+use lambda::Lambda;
 
 #[derive(Debug, Clone)]
 pub struct List {
@@ -92,6 +93,21 @@ impl List {
                     buffer = String::new();
                 }
             }
+            else if ch == '|' { //Lambda
+                if cells.len() == 0 && buffer.len() == 0 {
+                    let mut inner_buffer = String::new();
+                    loop {
+                        match code_iter.next() { // consume iterator
+                            Some(v) => inner_buffer.push(v),
+                            None => break
+                        }
+                    }
+                    cells.push(Value::Lambda(Lambda::from_string(inner_buffer)?));
+                }
+                else {
+                    buffer.push('|');
+                }
+            }
             else {
                 buffer.push(ch);
             }
@@ -119,7 +135,8 @@ impl List {
             }
         }
         let mut retval = Value::Nil;
-        if self.cells.len() == 0 {
+        let cell_count = self.cells().len();
+        if cell_count == 0 {
             let _ = stack.pop();
             return Ok(retval)
         }
@@ -128,19 +145,51 @@ impl List {
                 retval = value;
             }, 
             None => { //there is no builtin function with that name, look for lambdas on the stack or execute the list
-                let name = match self.cells.get(0).unwrap() {
+                let mut cell_iter = self.cells.iter();
+                let name = match cell_iter.next().unwrap() {
                     &Value::Symbol(ref name) => name,
                     &Value::List(ref list) => {
-                        return list.clone().eval(stack, None);
+                        if cell_count == 1 {
+                            let temp = list.clone().eval(stack, None);
+                            let _ = stack.pop();
+                            return temp;
+                        }
+                        else { 
+                            //evaluate the inner list, append the following items, and evaluate that list
+                            let first_elem = list.clone().eval(stack, None)?;
+                            let mut temp_cells = vec!(first_elem);
+                            for elem in cell_iter { //append remaining
+                                temp_cells.push(elem.clone());
+                            }
+                            let temp = List::new_with_cells(temp_cells).eval(stack, None);
+                            let _ = stack.pop();
+                            return temp;
+                        }
                     },
-                    value => return Err(Error::new(format!("expected function name as first list item, found {}.", value.type_str())))
+                    &Value::Lambda(ref lambda) => {
+                        let _ = stack.pop();
+                        if cell_count == 1 {
+                            return Ok(Value::Lambda(lambda.clone()));
+                        }
+                        else {
+                            return Err(Error::new(format!("the lambda is not the only element of the list.")));
+                        }
+                    },
+                    value => {
+                        let _ = stack.pop();
+                        return Err(Error::new(format!("expected function name as first list item, found {}.", value.type_str())))
+                    }
                 };
                 let mut lambda = match resolve_variable(name, stack)? {
                     Value::Lambda(lambda) => lambda,
-                    _ => return Err(Error::new(format!("unknown function '{}'.", name)))
+                    _ => {
+                        let _ = stack.pop();
+                        return Err(Error::new(format!("unknown function '{}'.", name)))
+                    }
                 };
                 let param_count = self.cells.len() - 1;
                 if param_count != lambda.param_count() {
+                    let _ = stack.pop();
                     return Err(Error::new(format!("'{}': expected {} function parameters, found {}.", name, lambda.param_count(), param_count)));
                 }
                 let mut params = Vec::new();
