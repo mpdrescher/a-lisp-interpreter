@@ -4,6 +4,7 @@ use error::Error;
 use functions::invalid_types;
 use functions::resolve_argument;
 use functions::resolve_two_arguments;
+use functions::resolve_three_arguments;
 use value::Value;
 
 pub fn first(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
@@ -100,7 +101,7 @@ pub fn nth(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     match (op_1, op_2) {
         (Value::Integer(index), Value::List(list)) => {
             if index < 0 {
-                return Err(Error::new(format!("'nth': index must be non-negative.")));
+                return Err(Error::new_with_origin("nth", format!("index must be non-negative.")));
             }
             else if list.cells().len() == 0 || index >= list.cells().len() as i32 { //TODO: rethink this
                 return Ok(Value::Nil);
@@ -140,7 +141,7 @@ pub fn map(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
         (Value::Lambda(mut lambda), Value::List(list)) => {
             let mut result = Vec::new();
             for value in list.into_cells().into_iter() {
-                result.push(lambda.eval(vec!(value), stack)?);
+                result.push(lambda.eval_with_trace(vec!(value), stack, format!("map"))?);
             }
             return Ok(Value::List(List::new_with_cells(result)));
         },
@@ -152,22 +153,21 @@ pub fn map(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 }
 
 pub fn fold(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    let (op_1, op_2) = resolve_two_arguments(list, stack, "fold")?;
-    match (op_1, op_2) {
-        (Value::Lambda(mut lambda), Value::List(list)) => {
+    let (op_1, op_2, op_3) = resolve_three_arguments(list, stack, "fold")?;
+    match (op_1, op_2, op_3) {
+        (first, Value::Lambda(mut lambda), Value::List(list)) => {
             let mut acc;
             if list.cells().len() == 0 {
                 return Ok(Value::Nil);
             }
-            let mut list_iter = list.into_cells().into_iter();
-            acc = list_iter.next().unwrap();
-            for elem in list_iter {
-                acc = lambda.eval(vec!(acc, elem), stack)?;
+            acc = first;
+            for elem in list.into_cells().into_iter() {
+                acc = lambda.eval_with_trace(vec!(acc, elem), stack, format!("fold"))?;
             }
             return Ok(acc);
         },
-        (type_1, type_2) => {
-            invalid_types(vec!(&type_1, &type_2), "fold")?;
+        (type_1, type_2, type_3) => {
+            invalid_types(vec!(&type_1, &type_2, &type_3), "fold")?;
         }
     }
     Ok(Value::Nil)
@@ -180,14 +180,14 @@ pub fn any(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
             let mut result = false;
             let mut index_counter = 0;
             for elem in list.into_cells().into_iter() {
-                let elem_result = lambda.eval(vec!(elem), stack)?;
+                let elem_result = lambda.eval_with_trace(vec!(elem), stack, format!("any"))?;
                 match elem_result {
                     Value::Boolean(true) => {
                         result = true;
                     },
                     Value::Boolean(false) => {},
                     _ => {
-                        return Err(Error::new(format!("'any': expected boolean at index {}.", index_counter)));
+                        return Err(Error::new_with_origin("any", format!("expected boolean at index {}.", index_counter)));
                     }
                 }
                 index_counter += 1;
@@ -211,14 +211,14 @@ pub fn all(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
             }
             let mut index_counter = 0;
             for elem in list.into_cells().into_iter() {
-                let elem_result = lambda.eval(vec!(elem), stack)?;
+                let elem_result = lambda.eval_with_trace(vec!(elem), stack, format!("all"))?;
                 match elem_result {
                     Value::Boolean(false) => {
                         result = false;
                     },
                     Value::Boolean(true) => {},
                     _ => {
-                        return Err(Error::new(format!("'all': expected boolean at index {}.", index_counter)));
+                        return Err(Error::new_with_origin("all", format!("expected boolean at index {}.", index_counter)));
                     }
                 }
                 index_counter += 1;

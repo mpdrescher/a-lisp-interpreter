@@ -7,16 +7,49 @@ use std::env;
 use std::io::Read;
 use std::io::Result as IOResult;
 use std::fs::File;
+use std::fs;
+
+//TODO: change printlns to function return values
 
 pub struct Interpreter {
     global: Scope
 }
 
 impl Interpreter {
-    pub fn new() -> Interpreter {
+    pub fn load_std(&mut self) -> IOResult<()> {
+        for maybe_entry in fs::read_dir("std")? {
+            let entry = maybe_entry?;
+            let path = entry.path();
+            if !path.is_dir() {
+                let pathstr = match path.to_str() {
+                    Some(v) => v.to_owned(),
+                    None => {
+                        println!("std path does not contain valid UTF-8.");
+                        break;
+                    }
+                };
+                self.load_script(pathstr)?;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn new_empty() -> Interpreter {
         Interpreter {
             global: Scope::new()
         }
+    }
+
+    pub fn new() -> Interpreter {
+        let mut interpreter = Interpreter::new_empty();
+        match interpreter.load_std() {
+            Ok(_) => {},
+            Err(err) => {
+                println!("error while loading std:");
+                println!("{}", err);
+            }
+        }
+        interpreter
     }
 
     pub fn eval(&mut self, code: String) -> Result<Value, Error> {
@@ -31,7 +64,6 @@ impl Interpreter {
         let mut code = String::new();
         let mut file = File::open(path)?;
         let _ = file.read_to_string(&mut code)?;
-        let mut interpreter = Interpreter::new();
         let mut line_buffer = String::new();
         let mut code_iter = code.chars();
         loop {

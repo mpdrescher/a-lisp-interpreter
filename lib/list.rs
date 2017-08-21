@@ -159,7 +159,7 @@ impl List {
                             //a future change might implement binding values to lambdas similar to
                             //javascripts bind or haskells currying
                             //this would include making the standard functions lambda-like:
-                            // -> fold (*) (1 2 3) = 6
+                            // -> fold (*) '(1 2 3) = 6
                             let first_elem = list.clone().eval(stack, None)?;
                             let mut temp_cells = vec!(first_elem);
                             for elem in cell_iter { //append remaining
@@ -201,7 +201,12 @@ impl List {
                     let param = resolve(self.cells.get(i).unwrap().clone(), stack, "[eval]")?;
                     params.push(param);
                 }
-                retval = lambda.eval(params, stack)?;
+                retval = match lambda.eval(params, stack) {
+                    Ok(v) => v,
+                    Err(err) => {
+                        return Err(err.add_trace(format!("lambda")));
+                    }
+                }; 
             }
         };
         let _ = stack.pop(); //remove the scope of this function

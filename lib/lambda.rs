@@ -22,6 +22,15 @@ impl Lambda {
         self.param_names.len()
     }
 
+    pub fn eval_with_trace(&mut self, params: Vec<Value>, stack: &mut Vec<Scope>, trace: String) -> Result<Value, Error> {
+        match self.eval(params, stack) {
+            Ok(v) => Ok(v),
+            Err(err) => {
+                Err(err.add_trace(trace))
+            }
+        }
+    }
+
     pub fn eval(&mut self, params: Vec<Value>, stack: &mut Vec<Scope>) -> Result<Value, Error> {
         let expected_len = self.param_names.len();
         let found_len = params.len();
@@ -29,7 +38,12 @@ impl Lambda {
             return Err(Error::new(format!("'lambda': expected {} parameters, found {}.", expected_len, found_len)));
         }
         let param_vec = self.param_names.clone().into_iter().zip(params).collect::<Vec<(String, Value)>>();
-        self.body.eval(stack, Some(param_vec))
+        match self.body.eval(stack, Some(param_vec)) {
+            Ok(v) => Ok(v),
+            Err(err) => {
+                Err(err.add_trace(format!("lambda definition")))
+            }
+        }
     }
 
     pub fn from_string(string: String) -> Result<Lambda, Error> {

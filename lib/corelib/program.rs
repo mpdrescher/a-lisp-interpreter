@@ -21,7 +21,7 @@ pub fn lambda(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
                         args.push(param_str.clone());
                     },
                     _ => {
-                        return Err(Error::new(format!("'lambda': only symbols can be used as function parameters.")));
+                        return Err(Error::new_with_origin("lambda", format!("only symbols can be used as function parameters.")));
                     }
                 }
             }
@@ -42,24 +42,24 @@ pub fn cond(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
         let inner_list = match cell {
             Value::List(list) => list,
             _ => {
-                return Err(Error::new(format!("'cond': expected a list instead of '{}' at index {}.", cell.type_str(), i - 1)));
+                return Err(Error::new_with_origin("cond", format!("expected a list instead of '{}' at index {}.", cell.type_str(), i - 1)));
             }
         };
         if inner_list.cells().len() != 2 {
-            return Err(Error::new(format!("'cond': expected a list with two elements at index {}, found one with {}.", i - 1, inner_list.cells().len())));
+            return Err(Error::new_with_origin("cond", format!("expected a list with two elements at index {}, found one with {}.", i - 1, inner_list.cells().len())));
         }
         let condition_value = resolve(inner_list.cells().get(0).unwrap().clone(), stack, "cond")?;
         let condition = match condition_value {
             Value::Boolean(boolean) => boolean,
             _ => {
-                return Err(Error::new(format!("'cond': expected a boolean as the first element at index {}", i - 1)));
+                return Err(Error::new_with_origin("cond", format!("expected a boolean as the first element at index {}", i - 1)));
             }
         };
         if condition {
             return Ok(resolve(inner_list.cells().get(1).unwrap().clone(), stack, "cond")?);
         }
     }
-    Err(Error::new(format!("'cond': no condition was true.")))
+    Err(Error::new_with_origin("cond", format!("no condition was true.")))
 }
 
 pub fn seq(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
@@ -79,7 +79,7 @@ pub fn set(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
         },
         (Value::Symbol(name), value) => {
             if stack.len() <= 1 {
-                return Err(Error::new(format!("'set': no scope above the current one.")));
+                return Err(Error::new_with_origin("set", format!("no scope above the current one.")));
             }
             let index = stack.len() - 2;
             stack.get_mut(index).unwrap().set_variable(name, value);
@@ -99,7 +99,7 @@ pub fn global(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
         },
         (Value::Symbol(name), value) => {
             if stack.len() == 0 {
-                return Err(Error::new(format!("'global': no scope found.")));
+                return Err(Error::new_with_origin("global", format!("no scope found.")));
             }
             stack.get_mut(0).unwrap().set_variable(name, value);
         },

@@ -16,6 +16,13 @@ impl Error {
         }
     }
 
+    pub fn new_with_origin(origin: &'static str, msg: String) -> Error {
+        Error {
+            message: format!("'{}': {}", origin, msg),
+            trace: Vec::new()
+        }
+    } 
+
     pub fn add_trace(mut self, trace: String) -> Error{
         self.trace.push(trace);
         self
@@ -24,9 +31,9 @@ impl Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> FmtResult { //TODO: group trace so that errors in recursion take only one line
-        writeln!(f, "    Error: {}", self.message)?;
+        writeln!(f, "Error: {}", self.message)?;
         for elem in &self.trace {
-            writeln!(f, "        ...at '{}'", elem)?;
+            writeln!(f, "    ...at '{}'", elem)?;
         }
         Ok(())
     }

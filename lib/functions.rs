@@ -121,14 +121,14 @@ pub fn resolve_two_arguments(list: &List, stack: &mut Vec<Scope>, fn_name: &'sta
     ))
 }
 
-/*pub fn resolve_three_arguments(list: &List, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<(Value, Value, Value), Error> {
+pub fn resolve_three_arguments(list: &List, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<(Value, Value, Value), Error> {
     assert_length(list, 3, fn_name)?;
     Ok((
         resolve(list.cells().get(1).unwrap().clone(), stack, fn_name)?,
         resolve(list.cells().get(2).unwrap().clone(), stack, fn_name)?,
         resolve(list.cells().get(3).unwrap().clone(), stack, fn_name)?
     ))
-}*/
+}
 
 pub fn assert_min_length(list: &List, length: usize, fn_name: &'static str) -> Result<(), Error> {
     let len = list.cells().len() - 1;
