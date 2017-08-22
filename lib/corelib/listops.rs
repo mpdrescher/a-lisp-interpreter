@@ -232,9 +232,35 @@ pub fn all(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
+pub fn filter(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "filter")?;
+    match (op_1, op_2) {
+        (Value::Lambda(mut lambda), Value::List(list)) => {
+            let mut new_list = Vec::new();
+            let mut index_counter = 0;
+            for value in list.into_cells().into_iter() {
+                let result = lambda.eval_with_trace(vec!(value.clone()), stack, format!("filter"))?;
+                match result {
+                    Value::Boolean(true) => {
+                        new_list.push(value);
+                    },
+                    Value::Boolean(false) => {},
+                    _ => {
+                        return Err(Error::new_with_origin("filter", format!("expected boolean at index {}.", index_counter)))
+                    }
+                }
+                index_counter += 1;
+            }
+            return Ok(Value::List(List::new_with_cells(new_list)));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "filter")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
 //TODO: function zip
-//TODO: function 'any'
-//TODO: function 'all'
 //TODO: function 'filter'
 //TODO: function 'rev'
 //TODO: function 'expand'

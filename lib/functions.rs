@@ -11,7 +11,9 @@ use corelib::math::{
     div,
     sin,
     cos,
-    tan
+    tan,
+    count,
+    modulo
 };
 use corelib::program::{
     set,
@@ -33,6 +35,7 @@ use corelib::listops::{
     nth,
     map,
     fold,
+    filter,
     any,
     all
 };
@@ -85,6 +88,9 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "fold" | "\\" => fold(list, stack),
         "any" => any(list, stack),
         "all" => all(list, stack),
+        "filter" => filter(list, stack),
+        "count" => count(list, stack),
+        "mod" => modulo(list, stack),
         _ => {
             return Ok(None)
         }

@@ -131,3 +131,45 @@ pub fn tan(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     }
     Ok(Value::Nil)
 }
+
+pub fn modulo(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "mod")?;
+    match (op_1, op_2) {
+        (Value::Integer(i_1), Value::Integer(i_2)) => {
+            return Ok(Value::Integer(i_1 % i_2));
+        },
+        (Value::Integer(i_1), Value::Float(f_2)) => {
+            return Ok(Value::Float(i_1 as f32 % f_2));
+        },
+        (Value::Float(f_1), Value::Integer(i_2)) => {
+            return Ok(Value::Float(f_1 % i_2 as f32));
+        },
+        (Value::Float(f_1), Value::Float(f_2)) => {
+            return Ok(Value::Float(f_1 % f_2));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "mod")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn count(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "count")?;
+    match (op_1, op_2) {
+        (Value::Integer(min), Value::Integer(max)) => {
+            if min > max {
+                return Err(Error::new_with_origin("count", format!("min ({}) was greater than max ({}).", min, max)));
+            }
+            let mut result = Vec::with_capacity((max - min) as usize);
+            for i in min..max {
+                result.push(Value::Integer(i));
+            }
+            return Ok(Value::List(List::new_with_cells(result)));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "count")?;
+        }
+    }
+    Ok(Value::Nil)
+}
