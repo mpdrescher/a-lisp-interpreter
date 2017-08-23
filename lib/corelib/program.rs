@@ -110,9 +110,27 @@ pub fn global(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn quote(list: &List, _stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn quote(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     assert_length(list, 1, "quote")?;
-    Ok(list.cells().get(1).unwrap().clone())
+    match list.cells().get(1).unwrap() {
+        &Value::List(ref list) => {
+            let mut retval = Vec::new();
+            for elem in list.clone().into_cells().into_iter() {
+                retval.push(match elem {
+                    Value::List(mut inner_list) => {
+                        inner_list.eval(stack, None)?
+                    },
+                    inner_value => {
+                        inner_value
+                   }
+                });
+            };
+            Ok(Value::List(List::new_with_cells(retval)))
+        },
+        value => {
+            Ok(value.clone())
+        }
+    }
 }
 
 pub fn printfmt(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {

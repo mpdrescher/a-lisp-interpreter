@@ -121,7 +121,7 @@ impl List {
     }
       
     //TODO: unwind stack on error for when 'try' is implemented
-    pub fn eval(&mut self, stack: &mut Vec<Scope>, maybe_params: Option<Vec<(String, Value)>>) -> Result<Value, Error> {
+    pub fn eval(&self, stack: &mut Vec<Scope>, maybe_params: Option<Vec<(String, Value)>>) -> Result<Value, Error> {
         match maybe_params {
             Some(params) => {
                 let mut scope = Scope::new(); //create a new scope with the given parameters

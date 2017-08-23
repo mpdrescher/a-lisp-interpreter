@@ -2,6 +2,7 @@ use list::List;
 use scope::Scope;
 use error::Error;
 use functions::invalid_types;
+use functions::resolve_argument;
 use functions::resolve_two_arguments;
 use value::Value;
 
@@ -126,6 +127,45 @@ pub fn ge(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
         },
         (type_1, type_2) => {
             invalid_types(vec!(&type_1, &type_2), "ge")?;
+        }
+    };
+    Ok(Value::Nil)
+}
+
+pub fn and(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "and")?;
+    match (op_1, op_2) {
+        (Value::Boolean(b1), Value::Boolean(b2)) => {
+            return Ok(Value::Boolean(b1 && b2))
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "and")?;
+        }
+    };
+    Ok(Value::Nil)
+}
+
+pub fn or(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "or")?;
+    match (op_1, op_2) {
+        (Value::Boolean(b1), Value::Boolean(b2)) => {
+            return Ok(Value::Boolean(b1 || b2))
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "or")?;
+        }
+    };
+    Ok(Value::Nil)
+}
+
+pub fn not(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "not")?;
+    match op_1 {
+        Value::Boolean(b1) => {
+            return Ok(Value::Boolean(!b1));
+        },
+        type_1 => {
+            invalid_types(vec!(&type_1), "not")?;
         }
     };
     Ok(Value::Nil)

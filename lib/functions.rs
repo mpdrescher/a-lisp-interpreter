@@ -45,7 +45,10 @@ use corelib::comp::{
     lt,
     gt,
     le,
-    ge
+    ge,
+    and,
+    not,
+    or
 };
 
 pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error> {
@@ -91,6 +94,9 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "filter" => filter(list, stack),
         "count" => count(list, stack),
         "mod" => modulo(list, stack),
+        "and" => and(list, stack),
+        "or" => or(list, stack),
+        "not" => not(list, stack),
         _ => {
             return Ok(None)
         }
