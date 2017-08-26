@@ -1,7 +1,7 @@
 use list::List;
 use value::Value;
-use scope::Scope;
 use error::Error;
+use stack::Stack;
 
 #[derive(Debug, Clone)]
 pub struct Lambda {
@@ -22,7 +22,7 @@ impl Lambda {
         self.param_names.len()
     }
 
-    pub fn eval_with_trace(&mut self, params: Vec<Value>, stack: &mut Vec<Scope>, trace: String) -> Result<Value, Error> {
+    pub fn eval_with_trace(&mut self, params: Vec<Value>, stack: &mut Stack, trace: String) -> Result<Value, Error> {
         match self.eval(params, stack) {
             Ok(v) => Ok(v),
             Err(err) => {
@@ -31,7 +31,7 @@ impl Lambda {
         }
     }
 
-    pub fn eval(&mut self, params: Vec<Value>, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+    pub fn eval(&mut self, params: Vec<Value>, stack: &mut Stack) -> Result<Value, Error> {
         let expected_len = self.param_names.len();
         let found_len = params.len();
         if expected_len != found_len {

@@ -1,5 +1,4 @@
 use list::List;
-use scope::Scope;
 use error::Error;
 use list::resolve;
 use functions::assert_length;
@@ -9,8 +8,9 @@ use functions::resolve_two_arguments;
 use functions::resolve_argument;
 use value::Value;
 use lambda::Lambda;
+use stack::Stack;
 
-pub fn lambda(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn lambda(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "lambda")?;
     match (op_1, op_2) {
         (Value::List(params), Value::List(value)) => {
@@ -35,7 +35,7 @@ pub fn lambda(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn cond(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn cond(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     assert_min_length(list, 1, "cond")?;
     for i in 1..list.cells().len() {
         let cell = resolve(list.cells().get(i).unwrap().clone(), stack, "cond")?;
@@ -62,7 +62,7 @@ pub fn cond(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Err(Error::new_with_origin("cond", format!("no condition was true.")))
 }
 
-pub fn seq(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn seq(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     assert_min_length(list, 2, "seq")?;
     let mut retval = Value::Nil;
     for i in 1..list.cells().len() {
@@ -71,18 +71,22 @@ pub fn seq(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(retval)
 }
 
-pub fn set(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn set(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "set")?;
     match (op_1, op_2) {
         (type_1, Value::Symbol(_)) => {
             invalid_types(vec!(&type_1, &Value::Symbol(String::new())), "set")?;
         },
         (Value::Symbol(name), value) => {
-            if stack.len() <= 1 {
+            if stack.size() <= 1 {
                 return Err(Error::new_with_origin("set", format!("no scope above the current one.")));
             }
-            let index = stack.len() - 2;
-            stack.get_mut(index).unwrap().set_variable(name, value);
+            match stack.set_or_append_variable(name, value) {
+                Ok(_) => {},
+                Err(err) => {
+                    return Err(err.add_trace(format!("set")));
+                }
+            }
         },
         (type_1, type_2) => {
             invalid_types(vec!(&type_1, &type_2), "set")?;
@@ -91,17 +95,17 @@ pub fn set(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn global(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn global(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "global")?;
     match (op_1, op_2) {
         (type_1, Value::Symbol(_)) => {
             invalid_types(vec!(&type_1, &Value::Symbol(String::new())), "global")?;
         },
         (Value::Symbol(name), value) => {
-            if stack.len() == 0 {
+            if stack.size() == 0 {
                 return Err(Error::new_with_origin("global", format!("no scope found.")));
             }
-            stack.get_mut(0).unwrap().set_variable(name, value);
+            stack.get_mut_first().unwrap().set_variable(name, value);
         },
         (type_1, type_2) => {
             invalid_types(vec!(&type_1, &type_2), "global")?;
@@ -110,38 +114,47 @@ pub fn global(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn quote(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn quote(list: &List, _stack: &mut Stack) -> Result<Value, Error> {
     assert_length(list, 1, "quote")?;
-    match list.cells().get(1).unwrap() {
-        &Value::List(ref list) => {
-            let mut retval = Vec::new();
-            for elem in list.clone().into_cells().into_iter() {
-                retval.push(match elem {
-                    Value::List(mut inner_list) => {
-                        inner_list.eval(stack, None)?
-                    },
-                    inner_value => {
-                        inner_value
-                   }
-                });
-            };
-            Ok(Value::List(List::new_with_cells(retval)))
-        },
-        value => {
-            Ok(value.clone())
-        }
-    }
+    Ok(list.cells().get(1).unwrap().clone())
 }
 
-pub fn printfmt(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn printfmt(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "printfmt")?;
     println!("{:?}", op_1);
     Ok(Value::Nil)
 }
 
-pub fn print(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn print(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "print")?;
     println!("{}", op_1);
+    Ok(Value::Nil)
+}
+
+pub fn while_loop(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "while")?;
+    match (op_1, op_2) {
+        (Value::List(head), Value::List(body)) => {
+            let mut last = Value::Nil;
+            loop {
+                match head.eval(stack, None)? {
+                    Value::Boolean(boolean) => {
+                        if boolean == false {
+                            break;
+                        }
+                    },
+                    type_1 => {
+                        return Err(Error::new_with_origin("while", format!("expected boolean in while condition, found {}.", type_1)));
+                    }
+                }
+                last = body.eval(stack, None)?;
+            }
+            return Ok(last);
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "while")?;
+        }
+    };
     Ok(Value::Nil)
 }
 

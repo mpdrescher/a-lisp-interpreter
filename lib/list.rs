@@ -3,6 +3,7 @@ use value::Value;
 use functions;
 use scope::Scope;
 use lambda::Lambda;
+use stack::Stack;
 
 #[derive(Debug, Clone)]
 pub struct List {
@@ -121,7 +122,7 @@ impl List {
     }
       
     //TODO: unwind stack on error for when 'try' is implemented
-    pub fn eval(&self, stack: &mut Vec<Scope>, maybe_params: Option<Vec<(String, Value)>>) -> Result<Value, Error> {
+    pub fn eval(&self, stack: &mut Stack, maybe_params: Option<Vec<(String, Value)>>) -> Result<Value, Error> {
         match maybe_params {
             Some(params) => {
                 let mut scope = Scope::new(); //create a new scope with the given parameters
@@ -137,7 +138,7 @@ impl List {
         let mut retval = Value::Nil;
         let cell_count = self.cells().len();
         if cell_count == 0 {
-            let _ = stack.pop();
+            stack.pop();
             return Ok(retval)
         }
         match functions::eval(&self, stack)? {
@@ -151,7 +152,7 @@ impl List {
                     &Value::List(ref list) => {
                         if cell_count == 1 {
                             let temp = list.clone().eval(stack, None);
-                            let _ = stack.pop();
+                            stack.pop();
                             return temp;
                         }
                         else { 
@@ -166,12 +167,12 @@ impl List {
                                 temp_cells.push(elem.clone());
                             }
                             let temp = List::new_with_cells(temp_cells).eval(stack, None);
-                            let _ = stack.pop();
+                            stack.pop();
                             return temp;
                         }
                     },
                     &Value::Lambda(ref lambda) => {
-                        let _ = stack.pop();
+                        stack.pop();
                         if cell_count == 1 {
                             return Ok(Value::Lambda(lambda.clone()));
                         }
@@ -180,20 +181,20 @@ impl List {
                         }
                     },
                     value => {
-                        let _ = stack.pop();
+                        stack.pop();
                         return Err(Error::new(format!("expected function name as first list item, found {}.", value.type_str())))
                     }
                 };
-                let mut lambda = match resolve_variable(name, stack)? {
+                let mut lambda = match stack.resolve_variable(name)? {
                     Value::Lambda(lambda) => lambda,
                     _ => {
-                        let _ = stack.pop();
+                        stack.pop();
                         return Err(Error::new(format!("unknown function '{}'.", name)))
                     }
                 };
                 let param_count = self.cells.len() - 1;
                 if param_count != lambda.param_count() {
-                    let _ = stack.pop();
+                    stack.pop();
                     return Err(Error::new(format!("'{}': expected {} function parameters, found {}.", name, lambda.param_count(), param_count)));
                 }
                 let mut params = Vec::new();
@@ -209,7 +210,7 @@ impl List {
                 }; 
             }
         };
-        let _ = stack.pop(); //remove the scope of this function
+        stack.pop(); //remove the scope of this function
         Ok(retval)
     }
 }
@@ -227,9 +228,9 @@ fn push_to_cells(list: &mut Vec<Value>, buffer: String, quoted: &mut bool) -> Re
 }
 
 //resolves the parameters a function gets
-pub fn resolve(val: Value, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<Value, Error> {
+pub fn resolve(val: Value, stack: &mut Stack, fn_name: &'static str) -> Result<Value, Error> {
     match val {
-        Value::List(mut list) => {
+        Value::List(list) => {
             match list.eval(stack, None) {
                 Ok(v) => {
                     return Ok(v);
@@ -240,26 +241,11 @@ pub fn resolve(val: Value, stack: &mut Vec<Scope>, fn_name: &'static str) -> Res
             }
         },
         Value::Symbol(symbol) => {
-            resolve_variable(&symbol, stack)
+            stack.resolve_variable(&symbol)
         },
         Value::Nil => {
             return Ok(Value::List(List::empty()));
         }
         rest => Ok(rest)
     }
-}
-
-fn resolve_variable(var: &String, stack: &mut Vec<Scope>) -> Result<Value, Error> {
-    let mut counter = stack.len() - 1;
-    loop {
-        let scope = stack.get(counter).unwrap();
-        if scope.has_variable(&var) {
-            return Ok(scope.get_variable(&var).unwrap().clone()); //TODO: Cloning large variables is bad
-        }
-        if counter == 0 {
-            break;
-        }
-        counter -= 1;
-    }
-    Err(Error::new(format!("unknown variable '{}'.", var)))
 }

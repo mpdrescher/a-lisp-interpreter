@@ -1,13 +1,13 @@
 use list::List;
-use scope::Scope;
 use error::Error;
 use functions::invalid_types;
 use functions::resolve_argument;
 use functions::resolve_two_arguments;
 use functions::resolve_three_arguments;
 use value::Value;
+use stack::Stack;
 
-pub fn first(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn first(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "first")?;
     match op_1 {
         Value::List(list) => {
@@ -25,7 +25,7 @@ pub fn first(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn last(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn last(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "last")?;
     match op_1 {
         Value::List(list) => {
@@ -44,7 +44,7 @@ pub fn last(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn init(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn init(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "init")?;
     match op_1 {
         Value::List(mut list) => {
@@ -64,7 +64,7 @@ pub fn init(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn tail(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn tail(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "tail")?;
     match op_1 {
         Value::List(mut list) => {
@@ -83,7 +83,7 @@ pub fn tail(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn len(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn len(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "len")?;
     match op_1 {
         Value::List(list) => {
@@ -96,7 +96,7 @@ pub fn len(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn nth(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn nth(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "nth")?;
     match (op_1, op_2) {
         (Value::Integer(index), Value::List(list)) => {
@@ -115,7 +115,7 @@ pub fn nth(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn cons(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn cons(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "cons")?;
     match (op_1, op_2) {
         (val, Value::List(mut list)) => {
@@ -135,7 +135,7 @@ pub fn cons(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
 
 //TODO: add error trace to an error when a lamdba fails
 
-pub fn map(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn map(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "map")?;
     match (op_1, op_2) {
         (Value::Lambda(mut lambda), Value::List(list)) => {
@@ -152,7 +152,7 @@ pub fn map(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn fold(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn fold(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2, op_3) = resolve_three_arguments(list, stack, "fold")?;
     match (op_1, op_2, op_3) {
         (first, Value::Lambda(mut lambda), Value::List(list)) => {
@@ -173,7 +173,7 @@ pub fn fold(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn any(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn any(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "any")?;
     match (op_1, op_2) {
         (Value::Lambda(mut lambda), Value::List(list)) => {
@@ -201,7 +201,7 @@ pub fn any(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn all(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn all(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "all")?;
     match (op_1, op_2) {
         (Value::Lambda(mut lambda), Value::List(list)) => {
@@ -232,7 +232,7 @@ pub fn all(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn filter(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn filter(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "filter")?;
     match (op_1, op_2) {
         (Value::Lambda(mut lambda), Value::List(list)) => {

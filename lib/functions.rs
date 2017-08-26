@@ -2,7 +2,7 @@ use list::List;
 use list::resolve;
 use error::Error;
 use value::Value;
-use scope::Scope;
+use stack::Stack;
 
 use corelib::math::{
     add,
@@ -23,7 +23,8 @@ use corelib::program::{
     cond,
     printfmt,
     print,
-    global
+    global,
+    while_loop
 };
 use corelib::listops::{
     first,
@@ -51,7 +52,7 @@ use corelib::comp::{
     or
 };
 
-pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error> {
+pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
     let function = match list.cells().first().unwrap() { //unwrap, because eval checks for empty list
         &Value::Symbol(ref func) => func,
         _ => {
@@ -97,6 +98,7 @@ pub fn eval(list: &List, stack: &mut Vec<Scope>) -> Result<Option<Value>, Error>
         "and" => and(list, stack),
         "or" => or(list, stack),
         "not" => not(list, stack),
+        "while" => while_loop(list, stack),
         _ => {
             return Ok(None)
         }
@@ -120,12 +122,12 @@ pub fn invalid_types(types: Vec<&Value>, fn_name: &'static str) -> Result<(), Er
 }
 
 //might seem hacky, but is the only way I can use pattern matching
-pub fn resolve_argument(list: &List, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<Value, Error> {
+pub fn resolve_argument(list: &List, stack: &mut Stack, fn_name: &'static str) -> Result<Value, Error> {
     assert_length(list, 1, fn_name)?;
     Ok(resolve(list.cells().get(1).unwrap().clone(), stack, fn_name)?)
 }
 
-pub fn resolve_two_arguments(list: &List, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<(Value, Value), Error> {
+pub fn resolve_two_arguments(list: &List, stack: &mut Stack, fn_name: &'static str) -> Result<(Value, Value), Error> {
     assert_length(list, 2, fn_name)?;
     Ok((
         resolve(list.cells().get(1).unwrap().clone(), stack, fn_name)?,
@@ -133,7 +135,7 @@ pub fn resolve_two_arguments(list: &List, stack: &mut Vec<Scope>, fn_name: &'sta
     ))
 }
 
-pub fn resolve_three_arguments(list: &List, stack: &mut Vec<Scope>, fn_name: &'static str) -> Result<(Value, Value, Value), Error> {
+pub fn resolve_three_arguments(list: &List, stack: &mut Stack, fn_name: &'static str) -> Result<(Value, Value, Value), Error> {
     assert_length(list, 3, fn_name)?;
     Ok((
         resolve(list.cells().get(1).unwrap().clone(), stack, fn_name)?,

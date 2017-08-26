@@ -3,11 +3,11 @@ use error::Error;
 use list::List;
 use scope::Scope;
 
-use std::env;
 use std::io::Read;
 use std::io::Result as IOResult;
 use std::fs::File;
 use std::fs;
+use stack::Stack;
 
 //TODO: change printlns to function return values
 
@@ -54,9 +54,9 @@ impl Interpreter {
 
     pub fn eval(&mut self, code: String) -> Result<Value, Error> {
         let mut list = List::from_string(code)?;
-        let mut stack = vec!(self.global.clone());
+        let mut stack = Stack::from_scopes(vec!(self.global.clone()));
         let result = list.eval(&mut stack, None);
-        self.global = stack.into_iter().next().unwrap();
+        self.global = stack.into_first_scope().unwrap();
         result
     }
 

@@ -1,12 +1,12 @@
 use list::List;
-use scope::Scope;
 use error::Error;
+use stack::Stack;
 use functions::invalid_types;
 use functions::resolve_argument;
 use functions::resolve_two_arguments;
 use value::Value;
 
-pub fn eq(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn eq(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "eq")?;
     let is_equal = match (op_1, op_2) {
         (Value::Nil, Value::Nil) => true,
@@ -25,7 +25,7 @@ pub fn eq(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Boolean(is_equal))
 }
 
-pub fn ne(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn ne(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "ne")?;
     let is_equal = match (op_1, op_2) {
         (Value::Nil, Value::Nil) => false,
@@ -44,7 +44,7 @@ pub fn ne(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Boolean(is_equal))
 }
 
-pub fn lt(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn lt(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "lt")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
@@ -66,7 +66,7 @@ pub fn lt(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn gt(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn gt(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "gt")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
@@ -88,7 +88,7 @@ pub fn gt(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn le(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn le(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "le")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
@@ -110,7 +110,7 @@ pub fn le(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)    
 }
 
-pub fn ge(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn ge(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "ge")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
@@ -132,7 +132,7 @@ pub fn ge(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn and(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn and(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "and")?;
     match (op_1, op_2) {
         (Value::Boolean(b1), Value::Boolean(b2)) => {
@@ -145,7 +145,7 @@ pub fn and(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn or(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn or(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "or")?;
     match (op_1, op_2) {
         (Value::Boolean(b1), Value::Boolean(b2)) => {
@@ -158,7 +158,7 @@ pub fn or(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn not(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn not(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "not")?;
     match op_1 {
         Value::Boolean(b1) => {

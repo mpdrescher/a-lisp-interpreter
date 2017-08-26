@@ -6,3 +6,4 @@ pub mod lambda;
 pub mod list;
 pub mod scope;
 pub mod value;
+pub mod stack;

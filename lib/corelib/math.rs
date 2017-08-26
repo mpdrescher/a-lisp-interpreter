@@ -1,5 +1,4 @@
 use list::List;
-use scope::Scope;
 use error::Error;
 use functions::{
     resolve_argument,
@@ -8,8 +7,9 @@ use functions::{
     to_float
 };
 use value::Value;
+use stack::Stack;
 
-pub fn add(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn add(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "add")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
@@ -31,7 +31,7 @@ pub fn add(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn sub(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn sub(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "sub")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
@@ -53,7 +53,7 @@ pub fn sub(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn mul(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn mul(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "mul")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
@@ -75,7 +75,7 @@ pub fn mul(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn div(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn div(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "div")?;
     let val_1 = to_float(op_1);
     let val_2 = to_float(op_2);
@@ -90,7 +90,7 @@ pub fn div(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn sin(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn sin(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "sin")?;
     let val_1 = to_float(op_1);
     match val_1 {
@@ -104,7 +104,7 @@ pub fn sin(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn cos(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn cos(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "cos")?;    
     let val_1 = to_float(op_1);
     match val_1 {
@@ -118,7 +118,7 @@ pub fn cos(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn tan(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn tan(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "tan")?;    
     let val_1 = to_float(op_1);
     match val_1 {
@@ -132,7 +132,7 @@ pub fn tan(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn modulo(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn modulo(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "mod")?;
     match (op_1, op_2) {
         (Value::Integer(i_1), Value::Integer(i_2)) => {
@@ -154,7 +154,7 @@ pub fn modulo(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn count(list: &List, stack: &mut Vec<Scope>) -> Result<Value, Error> {
+pub fn count(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "count")?;
     match (op_1, op_2) {
         (Value::Integer(min), Value::Integer(max)) => {
