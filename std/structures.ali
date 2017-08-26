@@ -1,0 +1,3 @@
+(set 'defun (
+    lambda '(name params fn) '(global name (lambda params fn))
+))

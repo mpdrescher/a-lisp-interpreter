@@ -25,7 +25,8 @@ use corelib::program::{
     print,
     global,
     while_loop,
-    spawn
+    spawn,
+    eval as eval_fn
 };
 use corelib::listops::{
     first,
@@ -39,7 +40,8 @@ use corelib::listops::{
     fold,
     filter,
     any,
-    all
+    all,
+    append
 };
 use corelib::comp::{
     eq,
@@ -63,7 +65,7 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
     let result = match &function[..] {
         "lambda" => lambda(list, stack),
         "seq" => seq(list, stack),
-        "set" => set(list, stack),
+        "set" | "$" => set(list, stack),
         "global" => global(list, stack),
         "quote" => quote(list, stack),
         "add" | "+" => add(list, stack),
@@ -101,6 +103,8 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "not" => not(list, stack),
         "while" => while_loop(list, stack),
         "spawn" => spawn(list, stack),
+        "eval" => eval_fn(list, stack),
+        "append" => append(list, stack),
         _ => {
             return Ok(None)
         }

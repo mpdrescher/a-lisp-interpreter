@@ -17,6 +17,7 @@ pub struct Interpreter {
 
 impl Interpreter {
     pub fn load_std(&mut self) -> IOResult<()> {
+        self.load_script(format!("std\\structures.ali"))?;
         for maybe_entry in fs::read_dir("std")? {
             let entry = maybe_entry?;
             let path = entry.path();
@@ -28,6 +29,9 @@ impl Interpreter {
                         break;
                     }
                 };
+                if pathstr.ends_with("structures.ali") {
+                    break;
+                }
                 self.load_script(pathstr)?;
             }
         }

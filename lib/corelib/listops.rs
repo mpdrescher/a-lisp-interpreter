@@ -129,6 +129,21 @@ pub fn cons(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
+pub fn append(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "append")?;
+    match (op_1, op_2) {
+        (Value::List(list_1), Value::List(list_2)) => {
+            let mut cells = list_1.into_cells();
+            cells.append(&mut list_2.into_cells());
+            return Ok(Value::List(List::from_cells(cells)));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "append")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
 //TODO: add function 'shape' which gives the nested size of a nested list like apls shape
 //TODO: add function 'splitat'
 //TODO: add function 'split'

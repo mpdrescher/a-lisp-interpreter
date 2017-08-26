@@ -1,0 +1,21 @@
+(defun 'sum '(x) '(fold 0 (|acc x| + acc x) x))
+
+(defun 'product '(x) '(fold 1 (|acc x| * acc x) x))
+
+(defun 'inc '(x) '(+ x 1))
+(defun 'dec '(x) '(- x 1))
+
+(defun 'addassign '(name value) '(set name (+ (eval name) value)))
+(defun 'subassign '(name value) '(set name (- (eval name) value)))
+(defun 'mulassign '(name value) '(set name (* (eval name) value)))
+(defun 'divassign '(name value) '(set name (/ (eval name) value)))
+(defun 'incassign '(name) '(set name (inc (eval name))))
+(defun 'decassign '(name) '(set name (dec (eval name))))
+(defun '+= '(name value) '(addassign name value))
+(defun '-= '(name value) '(subassign name value))
+(defun '*= '(name value) '(mulassign name value))
+(defun '/= '(name value) '(divassign name value))
+(defun '++ '(name) '(incassign name))
+(defun '-- '(name) '(decassign name))
+
+(defun 'avg '(x) '(/ (sum x) (len x)))

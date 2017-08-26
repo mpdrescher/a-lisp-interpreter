@@ -112,6 +112,11 @@ pub fn quote(list: &List, _stack: &mut Stack) -> Result<Value, Error> {
     Ok(list.cells().get(1).unwrap().clone())
 }
 
+pub fn eval(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "eval")?;
+    Ok(resolve(op_1, stack, "eval")?)
+}
+
 pub fn printfmt(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "printfmt")?;
     println!("{:?}", op_1);
