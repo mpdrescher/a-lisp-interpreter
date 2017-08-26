@@ -165,7 +165,7 @@ pub fn count(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             for i in min..max {
                 result.push(Value::Integer(i));
             }
-            return Ok(Value::List(List::new_with_cells(result)));
+            return Ok(Value::List(List::from_cells(result)));
         },
         (type_1, type_2) => {
             invalid_types(vec!(&type_1, &type_2), "count")?;

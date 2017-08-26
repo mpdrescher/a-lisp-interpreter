@@ -24,7 +24,8 @@ use corelib::program::{
     printfmt,
     print,
     global,
-    while_loop
+    while_loop,
+    spawn
 };
 use corelib::listops::{
     first,
@@ -99,6 +100,7 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "or" => or(list, stack),
         "not" => not(list, stack),
         "while" => while_loop(list, stack),
+        "spawn" => spawn(list, stack),
         _ => {
             return Ok(None)
         }

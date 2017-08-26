@@ -29,7 +29,7 @@ impl List {
         self.cells
     }
 
-    pub fn new_with_cells(cells: Vec<Value>) -> List {
+    pub fn from_cells(cells: Vec<Value>) -> List {
         List {
             cells: cells
         }
@@ -166,7 +166,7 @@ impl List {
                             for elem in cell_iter { //append remaining
                                 temp_cells.push(elem.clone());
                             }
-                            let temp = List::new_with_cells(temp_cells).eval(stack, None);
+                            let temp = List::from_cells(temp_cells).eval(stack, None);
                             stack.pop();
                             return temp;
                         }

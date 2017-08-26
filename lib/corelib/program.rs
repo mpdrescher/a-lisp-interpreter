@@ -9,6 +9,8 @@ use functions::resolve_argument;
 use value::Value;
 use lambda::Lambda;
 use stack::Stack;
+use interpreter::Interpreter;
+use std::thread;
 
 pub fn lambda(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "lambda")?;
@@ -60,15 +62,6 @@ pub fn cond(list: &List, stack: &mut Stack) -> Result<Value, Error> {
         }
     }
     Err(Error::new_with_origin("cond", format!("no condition was true.")))
-}
-
-pub fn seq(list: &List, stack: &mut Stack) -> Result<Value, Error> {
-    assert_min_length(list, 2, "seq")?;
-    let mut retval = Value::Nil;
-    for i in 1..list.cells().len() {
-        retval = resolve(list.cells().get(i).unwrap().clone(), stack, "seq")?;
-    }
-    Ok(retval)
 }
 
 pub fn set(list: &List, stack: &mut Stack) -> Result<Value, Error> {
@@ -158,4 +151,53 @@ pub fn while_loop(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
+pub fn spawn(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    assert_min_length(list, 2, "spawn")?;
+    let mut handles = Vec::new();
+    for i in 1..list.cells().len() {
+        let maybe_listelem = resolve(list.cells().get(i).unwrap().clone(), stack, "spawn")?;
+        let listelem = match maybe_listelem {
+            Value::List(list) => list,
+            type1 => {
+                return Err(Error::new_with_origin("spawn", format!("thread can only evaluate a list, found {}.", type1.type_str())))
+            }
+        };
+        let handle = thread::spawn(move || {
+            let mut interpreter = Interpreter::new_empty();
+            interpreter.eval(listelem)
+        });
+        handles.push(handle);
+    }
+    let mut retval = Vec::new();
+    let mut thread_counter = 0;
+    for elem in handles {
+        retval.push(
+            match elem.join() {
+                Ok(maybe_value) => {
+                    match maybe_value {
+                        Ok(value) => value,
+                        Err(err) => {
+                            return Err(err.add_trace(format!("thread {}", thread_counter)));
+                        }
+                    }
+                },
+                Err(_) => {
+                    return Err(Error::new_with_origin("spawn", format!("thread {} paniced.", thread_counter)));
+                }
+            }
+        );
+        thread_counter += 1;
+    }
+    Ok(Value::List(List::from_cells(retval)))
+}
+
 //TODO: function 'try' which catches errors and returns a value, like rusts .unwrap_or
+
+pub fn seq(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    assert_min_length(list, 2, "seq")?;
+    let mut retval = Value::Nil;
+    for i in 1..list.cells().len() {
+        retval = resolve(list.cells().get(i).unwrap().clone(), stack, "seq")?;
+    }
+    Ok(retval)
+}

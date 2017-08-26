@@ -52,8 +52,12 @@ impl Interpreter {
         interpreter
     }
 
-    pub fn eval(&mut self, code: String) -> Result<Value, Error> {
-        let mut list = List::from_string(code)?;
+    pub fn eval_string(&mut self, code: String) -> Result<Value, Error> {
+        let list = List::from_string(code)?;
+        self.eval(list)
+    }
+
+    pub fn eval(&mut self, list: List) -> Result<Value, Error> {
         let mut stack = Stack::from_scopes(vec!(self.global.clone()));
         let result = list.eval(&mut stack, None);
         self.global = stack.into_first_scope().unwrap();
@@ -78,7 +82,7 @@ impl Interpreter {
                             },
                             Some(')') => {
                                 if bracket_balance == 0 {
-                                    match self.eval(line_buffer) {
+                                    match self.eval_string(line_buffer) {
                                         Ok(_) => {},
                                         Err(e) => println!("{}", e)
                                     }

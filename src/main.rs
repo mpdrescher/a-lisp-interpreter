@@ -65,7 +65,7 @@ fn start_interactive() {
 
 fn eval(interpreter: &mut Interpreter, code: String) {
     println!();
-    match interpreter.eval(code) {
+    match interpreter.eval_string(code) {
         Ok(v) => println!("    {}\n", v),
         Err(e) => println!("{}", e)
     }

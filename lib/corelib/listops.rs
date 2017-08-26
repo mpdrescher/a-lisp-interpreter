@@ -143,7 +143,7 @@ pub fn map(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             for value in list.into_cells().into_iter() {
                 result.push(lambda.eval_with_trace(vec!(value), stack, format!("map"))?);
             }
-            return Ok(Value::List(List::new_with_cells(result)));
+            return Ok(Value::List(List::from_cells(result)));
         },
         (type_1, type_2) => {
             invalid_types(vec!(&type_1, &type_2), "map")?;
@@ -251,7 +251,7 @@ pub fn filter(list: &List, stack: &mut Stack) -> Result<Value, Error> {
                 }
                 index_counter += 1;
             }
-            return Ok(Value::List(List::new_with_cells(new_list)));
+            return Ok(Value::List(List::from_cells(new_list)));
         },
         (type_1, type_2) => {
             invalid_types(vec!(&type_1, &type_2), "filter")?;
