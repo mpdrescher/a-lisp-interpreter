@@ -5,6 +5,12 @@ use scope::Scope;
 use lambda::Lambda;
 use stack::Stack;
 
+enum Quoted {
+    No,
+    Quote,
+    Backquote
+}
+
 #[derive(Debug, Clone)]
 pub struct List {
     cells: Vec<Value>
@@ -39,7 +45,7 @@ impl List {
         let mut cells = Vec::new();
         let mut buffer = String::new();
         let mut code_iter = code.chars();
-        let mut quoted = false;
+        let mut quoted = Quoted::No;
         loop {
             let ch = match code_iter.next() {
                 Some(v) => v,
@@ -74,16 +80,26 @@ impl List {
                         inner_buffer.push(inner_ch);
                     }
                 }
-                if quoted {
-                    cells.push(Value::new_list(List::from_string(format!("quote ({})", inner_buffer))?));
-                    quoted = false;
-                }
-                else {
-                    cells.push(Value::new_list(List::from_string(inner_buffer)?));
-                }
+                match quoted {
+                    Quoted::No => {
+                        cells.push(Value::new_list(List::from_string(inner_buffer)?));
+                    },
+                    Quoted::Quote => {
+                        cells.push(Value::new_list(List::from_string(format!("quote ({})", inner_buffer))?));
+                        quoted = Quoted::No;
+                    },
+                    Quoted::Backquote => {
+                        cells.push(Value::new_list(List::from_string(format!("eval ({})", inner_buffer))?));
+                        quoted = Quoted::No;
+                    }
+                };
+                // push_to_cells(&mut cells, inner_buffer, &mut quoted)?;
             }
             else if ch == '\'' {
-                quoted = true;
+                quoted = Quoted::Quote;
+            }
+            else if ch == '`' {
+                quoted = Quoted::Backquote;
             }
             else if ch == ')' {
                 return Err(Error::new(format!("closed bracket before opening it.")));
@@ -216,14 +232,20 @@ impl List {
 }
 
 //helper function to tokenize a list string
-fn push_to_cells(list: &mut Vec<Value>, buffer: String, quoted: &mut bool) -> Result<(), Error> {
-    if *quoted {
-        list.push(Value::List(List::from_string(format!("quote {}", buffer))?));
-        *quoted = false;
-    }
-    else {
-        list.push(Value::from_string(buffer));
-    }
+fn push_to_cells(list: &mut Vec<Value>, buffer: String, quoted: &mut Quoted) -> Result<(), Error> {
+    match *quoted {
+        Quoted::No => {
+            list.push(Value::from_string(buffer));
+        },
+        Quoted::Quote => {
+            list.push(Value::List(List::from_string(format!("quote {}", buffer))?));
+            *quoted = Quoted::No;
+        },
+        Quoted::Backquote => {
+            list.push(Value::List(List::from_string(format!("eval {}", buffer))?));
+            *quoted = Quoted::No;        
+        }
+    };
     Ok(())
 }
 

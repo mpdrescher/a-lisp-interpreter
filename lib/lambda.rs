@@ -40,9 +40,7 @@ impl Lambda {
         let param_vec = self.param_names.clone().into_iter().zip(params).collect::<Vec<(String, Value)>>();
         match self.body.eval(stack, Some(param_vec)) {
             Ok(v) => Ok(v),
-            Err(err) => {
-                Err(err.add_trace(format!("lambda definition")))
-            }
+            err => err
         }
     }
 
