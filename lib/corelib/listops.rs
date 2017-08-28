@@ -311,6 +311,24 @@ pub fn filter(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
+pub fn contains(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "contains")?;
+    match (op_1, op_2) {
+        (Value::List(list), value) => {
+            for elem in list.into_cells() {
+                if elem == value {
+                    return Ok(Value::Boolean(true));
+                }
+            }
+            return Ok(Value::Boolean(false));        
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "contains")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
 //TODO: function zip
 //TODO: function 'rev'
 //TODO: function find

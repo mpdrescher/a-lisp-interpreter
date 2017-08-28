@@ -65,8 +65,23 @@ impl Value {
         }   
     }
 
-    pub fn from_char_string(string: String) -> Result<Value, Error> {
-        unimplemented!();
+    pub fn from_char_string(string: &str) -> Result<Value, Error> {
+        if string.starts_with('\\') {
+            let ch = match string {
+                "\\n" => '\n',
+                "\\t" => '\t',
+                "\\" => '\\',
+                "\\r" => '\r',
+                "\\´" => '´',
+                escape => {
+                    return Err(Error::new(format!("unknown character escape: {}.", escape)));
+                }
+            };
+            return Ok(Value::Char(ch));
+        }
+        else {
+            return Ok(Value::Char(string.chars().next().expect("empty string")));
+        }
     }
 
     pub fn new_list(list: List) -> Value {

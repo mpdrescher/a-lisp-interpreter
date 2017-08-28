@@ -26,7 +26,9 @@ use corelib::program::{
     global,
     while_loop,
     spawn,
-    eval as eval_fn
+    eval as eval_fn,
+    puts,
+    putsln
 };
 use corelib::listops::{
     first,
@@ -43,7 +45,8 @@ use corelib::listops::{
     any,
     all,
     append,
-    unique
+    unique,
+    contains
 };
 use corelib::comp::{
     eq,
@@ -109,6 +112,9 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "append" => append(list, stack),
         "unique" => unique(list, stack),
         "expand" => expand(list, stack),
+        "contains" => contains(list, stack),
+        "puts" => puts(list, stack),
+        "putsln" => putsln(list, stack),
         _ => {
             return Ok(None)
         }

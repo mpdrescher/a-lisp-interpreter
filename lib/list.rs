@@ -103,10 +103,8 @@ impl List {
                 let mut inner_buffer = String::new();
                 loop {
                     inner_buffer.push(match code_iter.next() {
-                        Some(v) => match v {
-                            '´' => break,
-                            v2 => v2
-                        },
+                        Some('´') => break,
+                        Some(v) => v,
                         None => return Err(Error::new(format!("reached end of list code before closing '´'.")))
                     });
                 }
@@ -116,10 +114,38 @@ impl List {
                 else if inner_buffer.len() == 0 {
                     return Err(Error::new(format!("a char can not be empty.")));
                 }
-                cells.push(Value::from_char_string(inner_buffer)?);
+                cells.push(Value::from_char_string(&inner_buffer[..])?);
             }
-            else if ch == '"' {
-
+            else if ch == '\"' {
+                if buffer.len() > 0 {
+                    push_to_cells(&mut cells, buffer, &mut quoted)?;
+                    buffer = String::new();
+                }
+                let mut inner_buffer = String::new();
+                loop {
+                    inner_buffer.push(match code_iter.next() {
+                        Some('"') => break,
+                        Some(v) => v,
+                        None => return Err(Error::new(format!("reached end of list code before closing '\"'.")))
+                    });
+                }
+                let mut string = Vec::new();
+                let mut backslash = false;
+                for elem in inner_buffer.chars() {
+                    match backslash {
+                        true => {
+                            backslash = false;
+                            string.push(Value::from_char_string(&format!("\\{}", elem)[..])?);
+                        },
+                        false => {
+                            string.push(Value::from_char_string(&format!("{}", elem)[..])?);
+                        }
+                    }
+                }
+                let mut inner_cells = Vec::new();
+                inner_cells.push(Value::Symbol(format!("quote")));
+                inner_cells.push(Value::List(List::from_cells(string)));
+                cells.push(Value::List(List::from_cells(inner_cells)));
             }
             else if ch == '\'' {
                 quoted = Quoted::Quote;

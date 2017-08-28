@@ -196,7 +196,33 @@ pub fn spawn(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     Ok(Value::List(List::from_cells(retval)))
 }
 
-//TODO: function 'try' which catches errors and returns a value, like rusts .unwrap_or
+pub fn puts(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "puts")?;
+    match op_1 {
+        Value::List(list) => {
+            for elem in list.into_cells() {
+                match elem {
+                    Value::Char(ch) => {
+                        print!("{}", ch);
+                    },
+                    _ => {
+                        return Err(Error::new_with_origin("puts", format!("found non-chararacter element in string.")));
+                    }
+                }
+            }
+        },
+        type_1 => {
+            invalid_types(vec!(&type_1), "puts")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn putsln(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let result = puts(list, stack);
+    println!();
+    result
+}
 
 pub fn seq(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     assert_min_length(list, 2, "seq")?;
@@ -206,3 +232,5 @@ pub fn seq(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     }
     Ok(retval)
 }
+
+//TODO: function 'try' which catches errors and returns a value, like rusts .unwrap_or
