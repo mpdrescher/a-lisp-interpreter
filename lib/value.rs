@@ -5,6 +5,7 @@ use std::fmt::{
 use std::fmt::Result as FmtResult;
 use std::fmt::Formatter;
 
+use error::Error;
 use list::List;
 use lambda::Lambda;
 
@@ -18,7 +19,8 @@ pub enum Value {
     Integer(i32),
     Symbol(String),
     Lambda(Lambda),
-    Boolean(bool)
+    Boolean(bool),
+    Char(char)
 }
 
 impl Value {
@@ -63,6 +65,10 @@ impl Value {
         }   
     }
 
+    pub fn from_char_string(string: String) -> Result<Value, Error> {
+        unimplemented!();
+    }
+
     pub fn new_list(list: List) -> Value {
         Value::List(list)
     }
@@ -79,7 +85,8 @@ impl Value {
             Value::Integer(_) => "integer",
             Value::Symbol(_) => "symbol",
             Value::Lambda(_) => "lambda",
-            Value::Boolean(_) => "boolean"
+            Value::Boolean(_) => "boolean",
+            Value::Char(_) => "char"
         }
     }
 }
@@ -120,7 +127,10 @@ impl Debug for Value {
             },
             &Value::Boolean(ref boolean) => {
                 write!(f, "{} [boolean]", boolean)
-            } 
+            },
+            &Value::Char(ref ch) => {
+                write!(f, "{} [char]", ch)
+            }
         }
     }
 }
@@ -161,6 +171,9 @@ impl Display for Value {
             },
             &Value::Boolean(ref boolean) => {
                 write!(f, "{}", boolean)
+            },
+            &Value::Char(ref ch) => {
+                write!(f, "{}", ch)
             }
         }
     }

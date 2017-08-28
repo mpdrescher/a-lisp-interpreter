@@ -61,7 +61,7 @@ impl List {
                 loop {
                     let inner_ch = match code_iter.next() {
                         Some(v) => v,
-                        None => return Err(Error::new(format!("reached end of code before closing bracket.")))
+                        None => return Err(Error::new(format!("reached end of list code before closing bracket.")))
                     };
                     if inner_ch == '(' {
                         depth_counter += 1;
@@ -94,6 +94,32 @@ impl List {
                     }
                 };
                 // push_to_cells(&mut cells, inner_buffer, &mut quoted)?;
+            }
+            else if ch == '´' {
+                if buffer.len() > 0 {
+                    push_to_cells(&mut cells, buffer, &mut quoted)?;
+                    buffer = String::new();
+                }
+                let mut inner_buffer = String::new();
+                loop {
+                    inner_buffer.push(match code_iter.next() {
+                        Some(v) => match v {
+                            '´' => break,
+                            v2 => v2
+                        },
+                        None => return Err(Error::new(format!("reached end of list code before closing '´'.")))
+                    });
+                }
+                if (inner_buffer.starts_with("\\") && inner_buffer.len() > 2) || (!inner_buffer.starts_with("\\") && inner_buffer.len() > 1) {
+                    return Err(Error::new(format!("the character type can only contain one character.")));
+                }
+                else if inner_buffer.len() == 0 {
+                    return Err(Error::new(format!("a char can not be empty.")));
+                }
+                cells.push(Value::from_char_string(inner_buffer)?);
+            }
+            else if ch == '"' {
+
             }
             else if ch == '\'' {
                 quoted = Quoted::Quote;
