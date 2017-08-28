@@ -10,7 +10,7 @@ use lambda::Lambda;
 
 const NUMBER_CHARS: [char; 14] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '+', '-', 'e'];
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum Value {
     Nil,
     List(List),

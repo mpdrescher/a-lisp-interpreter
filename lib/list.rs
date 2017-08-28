@@ -11,7 +11,7 @@ enum Quoted {
     Backquote
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct List {
     cells: Vec<Value>
 }

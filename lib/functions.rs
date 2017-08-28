@@ -38,10 +38,12 @@ use corelib::listops::{
     nth,
     map,
     fold,
+    expand,
     filter,
     any,
     all,
-    append
+    append,
+    unique
 };
 use corelib::comp::{
     eq,
@@ -105,6 +107,8 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "spawn" => spawn(list, stack),
         "eval" => eval_fn(list, stack),
         "append" => append(list, stack),
+        "unique" => unique(list, stack),
+        "expand" => expand(list, stack),
         _ => {
             return Ok(None)
         }

@@ -144,11 +144,24 @@ pub fn append(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-//TODO: add function 'shape' which gives the nested size of a nested list like apls shape
-//TODO: add function 'splitat'
-//TODO: add function 'split'
-
-//TODO: add error trace to an error when a lamdba fails
+pub fn unique(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "unique")?;
+    match op_1 {
+        Value::List(list) => {
+            let mut new_list = Vec::new();
+            for elem in list.into_cells() {
+                if !new_list.contains(&elem) {
+                    new_list.push(elem);
+                }
+            }
+            return Ok(Value::List(List::from_cells(new_list)));
+        },
+        type_1 => {
+            invalid_types(vec!(&type_1), "unique")?;            
+        }
+    }
+    Ok(Value::Nil)
+}
 
 pub fn map(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "map")?;
@@ -183,6 +196,29 @@ pub fn fold(list: &List, stack: &mut Stack) -> Result<Value, Error> {
         },
         (type_1, type_2, type_3) => {
             invalid_types(vec!(&type_1, &type_2, &type_3), "fold")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn expand(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let (op_1, op_2, op_3) = resolve_three_arguments(list, stack, "expand")?;
+    match (op_1, op_2, op_3) {
+        (first, Value::Lambda(mut lambda), Value::List(list)) => {
+            let mut acc = Vec::new();
+            if list.cells().len() == 0 {
+                return Ok(Value::Nil);
+            }
+            acc.push(first);
+            for elem in list.into_cells().into_iter() {
+                let current = lambda.eval_with_trace(vec!(acc.last().unwrap().clone(), elem), stack, format!("expand"))?;
+                acc.push(current);
+            }
+            acc.remove(0);
+            return Ok(Value::List(List::from_cells(acc)));
+        },
+        (type_1, type_2, type_3) => {
+            invalid_types(vec!(&type_1, &type_2, &type_3), "expand")?;
         }
     }
     Ok(Value::Nil)
@@ -276,6 +312,8 @@ pub fn filter(list: &List, stack: &mut Stack) -> Result<Value, Error> {
 }
 
 //TODO: function zip
-//TODO: function 'filter'
 //TODO: function 'rev'
-//TODO: function 'expand'
+//TODO: function find
+//TODO: add function 'shape' which gives the nested size of a nested list like apls shape
+//TODO: add function 'splitat'
+//TODO: add function 'split'
