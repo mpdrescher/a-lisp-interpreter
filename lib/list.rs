@@ -58,23 +58,30 @@ impl List {
                 }
                 let mut inner_buffer = String::new();
                 let mut depth_counter = 0;
+                let mut inner_quoted = false;
                 loop {
                     let inner_ch = match code_iter.next() {
                         Some(v) => v,
                         None => return Err(Error::new(format!("reached end of list code before closing bracket.")))
                     };
-                    if inner_ch == '(' {
-                        depth_counter += 1;
+                    if inner_ch == '"' {
+                        inner_quoted = !inner_quoted;
+                        inner_buffer.push(inner_ch);
+                    }
+                    else if inner_ch == '(' {
+                        if !inner_quoted {
+                            depth_counter += 1;
+                        }
                         inner_buffer.push(inner_ch);
                     }
                     else if inner_ch == ')' {
-                        if depth_counter == 0 {
+                        if !inner_quoted {
+                            depth_counter -= 1;
+                        }
+                        if depth_counter < 0 && !inner_quoted {
                             break;
                         }
-                        else {
-                            depth_counter -= 1;
-                            inner_buffer.push(inner_ch);
-                        }
+                        inner_buffer.push(inner_ch);
                     }
                     else {
                         inner_buffer.push(inner_ch);

@@ -96,5 +96,27 @@ fn unwrap_readline(line: Result<String, ReadlineError>) -> (String, bool) {
 }
 
 fn unclosed_brackets(string: &String) -> isize {
-    string.chars().fold(0, |acc, x| if x == '(' { acc + 1 } else if x == ')' { acc - 1 } else { acc })
+    let mut acc = 0;
+    let mut quoted = false;
+    for ch in string.chars() {
+        match ch {
+            '"' => {
+                quoted = !quoted;
+            },
+            '(' => {
+                if quoted {
+                    continue;
+                }
+                acc += 1;
+            },
+            ')' => {
+                if quoted {
+                    continue;
+                }
+                acc -= 1;
+            },
+            _ => {}
+        }
+    }
+    acc
 }
