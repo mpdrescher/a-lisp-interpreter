@@ -280,14 +280,13 @@ impl List {
                 }
                 let mut params = Vec::new();
                 for i in 1..self.cells.len() {
-                    let param = resolve(self.cells.get(i).unwrap().clone(), stack, "[eval]")?;
+                    let name_str = name.clone();
+                    let param = resolve(self.cells.get(i).unwrap().clone(), stack, &name_str[..])?;
                     params.push(param);
                 }
                 retval = match lambda.eval(params, stack) {
                     Ok(v) => v,
-                    Err(err) => {
-                        return Err(err.add_trace(format!("lambda")));
-                    }
+                    err => return err
                 }; 
             }
         };
@@ -315,7 +314,7 @@ fn push_to_cells(list: &mut Vec<Value>, buffer: String, quoted: &mut Quoted) -> 
 }
 
 //resolves the parameters a function gets
-pub fn resolve(val: Value, stack: &mut Stack, fn_name: &'static str) -> Result<Value, Error> {
+pub fn resolve(val: Value, stack: &mut Stack, fn_name: &str) -> Result<Value, Error> {
     match val {
         Value::List(list) => {
             match list.eval(stack, None) {

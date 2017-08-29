@@ -1,0 +1,5 @@
+(defun 'assert_type '(in comp) '(
+    cond 
+    '((eq (type in) comp) ())
+    '(true (throw "invalid type."))
+))

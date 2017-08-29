@@ -272,6 +272,33 @@ pub fn try(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     }
 }
 
+pub fn try_rename(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    assert_length(list, 2, "try_rename")?;
+    let op_1 = list.cells().get(1).unwrap().clone();
+    let op_2 = list.cells().get(2).unwrap().clone();
+    match resolve(op_1, stack, "try_rename") {
+        Ok(val) => Ok(val),
+        Err(mut err) => {
+            match resolve(op_2, stack, "try_rename") {
+                Ok(name) => {
+                    match name {
+                        Value::Symbol(symbol) => {
+                            err.clear_trace();
+                            Err(err.add_trace(symbol))
+                        },
+                        type_1 => {
+                            Err(Error::new_with_origin("try_rename", format!("expected symbol as new trace root, found {}.", type_1.type_str())))
+                        }
+                    }
+                },
+                Err(err) => {
+                    Err(err.add_trace(format!("try_rename")))
+                }
+            }
+        }
+    }
+}
+
 pub fn type_fn(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "typeof")?;
     Ok(op_1.type_value())

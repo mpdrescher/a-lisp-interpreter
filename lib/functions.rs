@@ -31,7 +31,8 @@ use corelib::program::{
     putsln,
     throw,
     try,
-    type_fn
+    type_fn,
+    try_rename
 };
 use corelib::listops::{
     first,
@@ -121,6 +122,7 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "throw" => throw(list, stack),
         "try" => try(list, stack),
         "type" => type_fn(list, stack),
+        "try_rename" => try_rename(list, stack),
         _ => {
             return Ok(None)
         }

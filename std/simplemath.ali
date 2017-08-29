@@ -2,7 +2,7 @@
 
 (defun 'product '(x) '(fold 1 (|acc x| * acc x) x))
 
-(defun 'inc '(x) '(+ x 1))
+(defun 'inc '(x) '(seq (assert_type x 'integer) (+ x 1)))
 (defun 'dec '(x) '(- x 1))
 
 (defun 'addassign '(name value) '(set name (+ `name value)))

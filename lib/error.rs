@@ -27,6 +27,10 @@ impl Error {
         self.trace.push(trace);
         self
     }
+
+    pub fn clear_trace(&mut self) {
+        self.trace.clear();
+    }
 }
 
 impl Display for Error {
