@@ -9,7 +9,7 @@ use std::fs::File;
 use stack::Stack;
 
 pub const STD_LIST: [&'static str; 3] = [
-    "std/structures.ali",
+    "std/basics.ali",
     "std/assert.ali",
     "std/simplemath.ali"
 ];

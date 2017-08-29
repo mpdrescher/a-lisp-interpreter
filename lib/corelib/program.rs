@@ -284,7 +284,7 @@ pub fn try_rename(list: &List, stack: &mut Stack) -> Result<Value, Error> {
                     match name {
                         Value::Symbol(symbol) => {
                             err.clear_trace();
-                            Err(err.add_trace(symbol))
+                            Err(err.set_origin(symbol))
                         },
                         type_1 => {
                             Err(Error::new_with_origin("try_rename", format!("expected symbol as new trace root, found {}.", type_1.type_str())))
@@ -302,4 +302,52 @@ pub fn try_rename(list: &List, stack: &mut Stack) -> Result<Value, Error> {
 pub fn type_fn(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "typeof")?;
     Ok(op_1.type_value())
+}
+
+pub fn format(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    assert_min_length(list, 2, "format")?;
+    let mut cell_iter = list.clone().into_cells().into_iter().skip(1);
+    let mut string = String::new();
+    match resolve(cell_iter.next().unwrap(), stack, "format")? {
+        Value::List(inner_list) => {
+            for elem in inner_list.into_cells() {
+                match elem {
+                    Value::Char(ch) => string.push(ch),
+                    type_1 => {
+                        println!("{}", type_1);
+                        return Err(Error::new_with_origin("format", format!("a string only contains characters, found type {} in list.", type_1.type_str())))
+                    }
+                }
+            }
+        }
+        type_1 => {
+            println!("{}", type_1);
+            invalid_types(vec!(&type_1), "format")?;
+        }
+    }
+    let mut args = Vec::new();
+    for cell in cell_iter {
+        args.push(resolve(cell, stack, "format")?);
+    }
+    let mut temp = Vec::new();
+    for split in string.split("$$") {
+        temp.push(split);
+    }
+    let mut result = Vec::new();
+    let templen = temp.len();
+    if templen-1 != args.len() {
+        return Err(Error::new_with_origin("format", format!("template and argument count does not match. template count: {}, arg count: {}", templen-1, args.len())))
+    }
+    let mut temp_iter = temp.into_iter();
+    for i in 0..templen-1 {
+        let mut current = temp_iter.next().unwrap().to_owned();
+        for ch in current.chars() {
+            result.push(Value::Char(ch));
+        }
+        current = format!("{}", args.get(i).unwrap());
+        for ch in current.chars() {
+            result.push(Value::Char(ch));
+        }
+    }
+    Ok(Value::List(List::from_cells(result)))
 }

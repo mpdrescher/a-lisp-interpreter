@@ -335,3 +335,4 @@ pub fn contains(list: &List, stack: &mut Stack) -> Result<Value, Error> {
 //TODO: add function 'shape' which gives the nested size of a nested list like apls shape
 //TODO: add function 'splitat'
 //TODO: add function 'split'
+//TODO: add function intersect
