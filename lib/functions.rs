@@ -30,7 +30,8 @@ use corelib::program::{
     puts,
     putsln,
     throw,
-    try
+    try,
+    type_fn
 };
 use corelib::listops::{
     first,
@@ -48,7 +49,7 @@ use corelib::listops::{
     all,
     append,
     unique,
-    contains
+    contains,
 };
 use corelib::comp::{
     eq,
@@ -119,6 +120,7 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "putsln" => putsln(list, stack),
         "throw" => throw(list, stack),
         "try" => try(list, stack),
+        "type" => type_fn(list, stack),
         _ => {
             return Ok(None)
         }

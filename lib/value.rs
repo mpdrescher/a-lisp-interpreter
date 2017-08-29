@@ -122,6 +122,11 @@ impl Value {
             Value::Char(_) => "char"
         }
     }
+
+    pub fn type_value(&self) -> Value {
+        let string = self.type_str();
+        Value::Symbol(string.to_owned())
+    }
 }
 
 impl Debug for Value {

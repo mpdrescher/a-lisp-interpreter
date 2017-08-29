@@ -271,3 +271,8 @@ pub fn try(list: &List, stack: &mut Stack) -> Result<Value, Error> {
         }
     }
 }
+
+pub fn type_fn(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "typeof")?;
+    Ok(op_1.type_value())
+}

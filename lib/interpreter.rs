@@ -6,8 +6,13 @@ use scope::Scope;
 use std::io::Read;
 use std::io::Result as IOResult;
 use std::fs::File;
-use std::fs;
 use stack::Stack;
+
+pub const STD_LIST: [&'static str; 3] = [
+    "std/structures.ali",
+    "std/assert.ali",
+    "std/simplemath.ali"
+];
 
 //TODO: change printlns to function return values
 
@@ -17,23 +22,8 @@ pub struct Interpreter {
 
 impl Interpreter {
     pub fn load_std(&mut self) -> IOResult<()> {
-        self.load_script(format!("std\\structures.ali"))?;
-        for maybe_entry in fs::read_dir("std")? {
-            let entry = maybe_entry?;
-            let path = entry.path();
-            if !path.is_dir() {
-                let pathstr = match path.to_str() {
-                    Some(v) => v.to_owned(),
-                    None => {
-                        println!("std path does not contain valid UTF-8.");
-                        break;
-                    }
-                };
-                if pathstr.ends_with("structures.ali") {
-                    break;
-                }
-                self.load_script(pathstr)?;
-            }
+        for elem in STD_LIST.iter() {
+            self.load_script(format!("{}", elem))?;
         }
         Ok(())
     }
