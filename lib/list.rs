@@ -114,7 +114,7 @@ impl List {
                 else if inner_buffer.len() == 0 {
                     return Err(Error::new(format!("a char can not be empty.")));
                 }
-                cells.push(Value::from_char_string(&inner_buffer[..])?);
+                cells.push(Value::char_from_string(&inner_buffer[..])?);
             }
             else if ch == '\"' {
                 if buffer.len() > 0 {
@@ -135,10 +135,10 @@ impl List {
                     match backslash {
                         true => {
                             backslash = false;
-                            string.push(Value::from_char_string(&format!("\\{}", elem)[..])?);
+                            string.push(Value::char_from_string(&format!("\\{}", elem)[..])?);
                         },
                         false => {
-                            string.push(Value::from_char_string(&format!("{}", elem)[..])?);
+                            string.push(Value::char_from_string(&format!("{}", elem)[..])?);
                         }
                     }
                 }

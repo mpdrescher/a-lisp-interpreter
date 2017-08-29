@@ -31,6 +31,8 @@ fn start_script(path: String) -> IOResult<()> {
     interpreter.load_script(path)
 }
 
+//TODO: ignore strings when deciding between ... and >>>
+
 fn start_interactive() {
     let mut rl = Editor::<()>::new();
     let mut interpreter = Interpreter::new();

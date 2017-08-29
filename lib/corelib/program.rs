@@ -233,4 +233,41 @@ pub fn seq(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     Ok(retval)
 }
 
-//TODO: function 'try' which catches errors and returns a value, like rusts .unwrap_or
+pub fn throw(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "throw")?;
+    if !op_1.is_list_and_string() {
+        return Err(Error::new_with_origin("throw", format!("argument can only be a string (a list that only contains characters).")));
+    }
+    match op_1 {
+        Value::List(list) => {
+            let mut string = String::new();
+            for elem in list.into_cells() {
+                match elem {
+                    Value::Char(ch) => {
+                        string.push(ch);
+                    },
+                    _ => {
+                        unreachable!();
+                    }
+                }
+            }
+            return Err(Error::new(string));
+        },
+        type_1 => {
+            invalid_types(vec!(&type_1), "throw")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn try(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    assert_length(list, 2, "try")?;
+    let op_1 = list.cells().get(1).unwrap().clone();
+    let op_2 = list.cells().get(2).unwrap().clone();
+    match resolve(op_1, stack, "try") {
+        Ok(val) => return Ok(val),
+        Err(_) => {
+            return resolve(op_2, stack, "try");
+        }
+    }
+}

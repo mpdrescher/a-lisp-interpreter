@@ -28,7 +28,9 @@ use corelib::program::{
     spawn,
     eval as eval_fn,
     puts,
-    putsln
+    putsln,
+    throw,
+    try
 };
 use corelib::listops::{
     first,
@@ -115,6 +117,8 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "contains" => contains(list, stack),
         "puts" => puts(list, stack),
         "putsln" => putsln(list, stack),
+        "throw" => throw(list, stack),
+        "try" => try(list, stack),
         _ => {
             return Ok(None)
         }

@@ -65,7 +65,7 @@ impl Value {
         }   
     }
 
-    pub fn from_char_string(string: &str) -> Result<Value, Error> {
+    pub fn char_from_string(string: &str) -> Result<Value, Error> {
         if string.starts_with('\\') {
             let ch = match string {
                 "\\n" => '\n',
@@ -90,6 +90,24 @@ impl Value {
 
     pub fn new_lambda(lambda: Lambda) -> Value {
         Value::Lambda(lambda)
+    }
+    
+    pub fn is_list_and_string(&self) -> bool {
+        match self {
+            &Value::List(ref list) => {
+                let mut result = true;
+                for elem in list.cells() {
+                    match elem {
+                        &Value::Char(_) => {},
+                        _ => {
+                            result = false;
+                        }
+                    }
+                }
+                result
+            },
+            _ => false
+        }
     }
 
     pub fn type_str(&self) -> &'static str {
