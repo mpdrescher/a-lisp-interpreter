@@ -128,24 +128,30 @@ impl List {
                     push_to_cells(&mut cells, buffer, &mut quoted)?;
                     buffer = String::new();
                 }
-                let mut inner_buffer = String::new();
-                loop {
-                    inner_buffer.push(match code_iter.next() {
-                        Some('"') => break,
-                        Some(v) => v,
-                        None => return Err(Error::new(format!("reached end of list code before closing '\"'.")))
-                    });
-                }
                 let mut string = Vec::new();
                 let mut backslash = false;
-                for elem in inner_buffer.chars() {
+                loop {
+                    let current = match code_iter.next() {
+                        Some('"') => break,
+                        Some('\\') => {
+                            if backslash {
+                                '\\'
+                            }
+                            else {
+                                backslash = true;
+                                continue;
+                            }
+                        }
+                        Some(v) => v,
+                        None => return Err(Error::new(format!("reached end of list code before closing '\"'.")))
+                    };
                     match backslash {
                         true => {
                             backslash = false;
-                            string.push(Value::char_from_string(&format!("\\{}", elem)[..])?);
+                            string.push(Value::char_from_string(&format!("\\{}", current)[..])?);
                         },
                         false => {
-                            string.push(Value::char_from_string(&format!("{}", elem)[..])?);
+                            string.push(Value::char_from_string(&format!("{}", current)[..])?);
                         }
                     }
                 }
