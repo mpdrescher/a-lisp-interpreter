@@ -6,3 +6,39 @@
     cond '(`condition result)
          '(true alt)
 ))
+
+(defun 'sum '(x) '(fold 0 (|acc x| + acc x) x))
+
+(defun 'product '(x) '(fold 1 (|acc x| * acc x) x))
+
+(defun 'inc '(x) '(+ x 1))
+
+(defun 'dec '(x) '(- x 1))
+
+(defun 'avg '(x) '(/ (sum x) (len x)))
+
+(defun 'min '(x y) '(
+    cond '((lt x y) x)
+    '(true y)
+))
+
+(defun 'max '(x y) '(
+    cond '((gt x y) x)
+    '(true y)
+))
+
+(defun 'addassign '(name value) '(set name (+ `name value)))
+(defun 'subassign '(name value) '(set name (- `name value)))
+(defun 'mulassign '(name value) '(set name (* `name value)))
+(defun 'divassign '(name value) '(set name (/ `name value)))
+(defun 'incassign '(name) '(set name (inc `name)))
+(defun 'decassign '(name) '(set name (dec `name)))
+(defun '+= '(name value) '(addassign name value))
+(defun '-= '(name value) '(subassign name value))
+(defun '*= '(name value) '(mulassign name value))
+(defun '/= '(name value) '(divassign name value))
+(defun '++ '(name) '(incassign name))
+(defun '-- '(name) '(decassign name))
+
+(defun 'contains '(list value) '(ne (find value list) -1))
+(defun 'union '(list1 list2) '(unique (append list1 list2)))

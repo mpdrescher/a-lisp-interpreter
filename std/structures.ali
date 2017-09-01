@@ -1,8 +1,0 @@
-(set 'defun (
-    |name params fn| (global name (lambda params (cons 'try_rename (cons fn (cons (cons 'quote (cons name '())) '())))))
-))
-
-(defun 'if '(condition result alt) '(
-    cond '(`condition result)
-         '(true alt)
-))

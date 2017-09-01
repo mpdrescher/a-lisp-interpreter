@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use list::List;
 use error::Error;
 use functions::invalid_types;
@@ -123,7 +125,7 @@ pub fn cons(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             return Ok(Value::List(list));
         },
         (type_1, type_2) => {
-            invalid_types(vec!(&type_1, &type_2), "push")?;
+            invalid_types(vec!(&type_1, &type_2), "cons")?;
         }
     }
     Ok(Value::Nil)
@@ -311,28 +313,153 @@ pub fn filter(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     Ok(Value::Nil)
 }
 
-pub fn contains(list: &List, stack: &mut Stack) -> Result<Value, Error> {
-    let (op_1, op_2) = resolve_two_arguments(list, stack, "contains")?;
+pub fn find(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "find")?;
     match (op_1, op_2) {
-        (Value::List(list), value) => {
+        (value, Value::List(list)) => {
+            let mut counter = 0;
             for elem in list.into_cells() {
                 if elem == value {
-                    return Ok(Value::Boolean(true));
+                    return Ok(Value::Integer(counter));
                 }
+                counter += 1;
             }
-            return Ok(Value::Boolean(false));        
+            return Ok(Value::Integer(-1));
         },
         (type_1, type_2) => {
-            invalid_types(vec!(&type_1, &type_2), "contains")?;
+            invalid_types(vec!(&type_1, &type_2), "find")?;
         }
     }
     Ok(Value::Nil)
 }
 
-//TODO: function zip
-//TODO: function 'rev'
-//TODO: function find
+pub fn split_at(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "split_at")?;
+    match (op_1, op_2) {
+        (Value::Integer(int_32), Value::List(list)) => {
+            if 0 <= int_32 && int_32 <= (list.cells().len() - 1) as i32 {
+                let int = int_32 as usize;
+                let cells = list.into_cells();
+                let (l1, l2) = cells.split_at(int);
+                let new_list = vec!(Value::List(List::from_cells(l1.to_owned())), Value::List(List::from_cells(l2.to_owned())));
+                return Ok(Value::List(List::from_cells(new_list)));
+            }
+            return Err(Error::new_with_origin("split_at", format!("index out of bounds: index is {}, list size is {}.", int_32, list.cells().len())));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "split_at")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn combine(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "combine")?;
+    match (op_1, op_2) {
+        (Value::List(list_1), Value::List(list_2)) => {
+            let cells_1 = list_1.into_cells();
+            let cells_2 = list_2.into_cells();
+            let mut result = Vec::new();
+            for elem_1 in cells_1 {
+                for elem_2 in cells_2.clone() {
+                    result.push(Value::List(List::from_cells(vec!(elem_1.clone(), elem_2))));
+                }
+            }
+            return Ok(Value::List(List::from_cells(result)));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "combine")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn intersect(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "intersect")?;
+    match (op_1, op_2) {
+        (Value::List(list_1), Value::List(list_2)) => {
+            let cells_1 = list_1.into_cells();
+            let cells_2 = list_2.into_cells();
+            let mut result = Vec::new();
+            for elem_1 in cells_1 {
+                for elem_2 in cells_2.clone() {
+                    if elem_1 == elem_2 {
+                        result.push(elem_2);
+                    }
+                }
+            }
+            return Ok(Value::List(List::from_cells(result)));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "intersect")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn zip(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let (op_1, op_2) = resolve_two_arguments(list, stack, "zip")?;
+    match (op_1, op_2) {
+        (Value::List(list_1), Value::List(list_2)) => {
+            let cells_1 = list_1.into_cells();
+            let cells_2 = list_2.into_cells();
+            let mut result = Vec::new();
+            let mut counter = 0;
+            for elem_1 in cells_1 {
+                let elem_2 = cells_2.get(counter).unwrap_or(&Value::Nil).to_owned();
+                    result.push(Value::List(List::from_cells(vec!(elem_1, elem_2))));
+                counter += 1;
+            }
+            return Ok(Value::List(List::from_cells(result)));
+        },
+        (type_1, type_2) => {
+            invalid_types(vec!(&type_1, &type_2), "zip")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+pub fn rev(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "rev")?;
+    match op_1 {
+        Value::List(list) => {
+            return Ok(Value::List(List::from_cells(list.into_cells().into_iter().rev().collect::<Vec<Value>>())));
+        },
+        type_1 => {
+            invalid_types(vec!(&type_1), "rev")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
+// TODO: f32 doesnt implement Ord, so I have to find another way to sort lists consisting of ints/floats
+pub fn sort(list: &List, stack: &mut Stack) -> Result<Value, Error> {
+    let op_1 = resolve_argument(list, stack, "sort")?;
+    match op_1 {
+        Value::List(list) => {
+            let mut sorted = BTreeSet::new();
+            let cells = list.into_cells();
+            for elem in cells.into_iter() {
+                match elem {
+                    Value::Integer(int) => {
+                        sorted.insert(int);
+                    },
+                    type_2 => {
+                        return Err(Error::new_with_origin("sort", format!("only lists that contain integers can be sorted. found {}.", type_2.type_str())))
+                    }
+                }
+            }
+            let new_cells = sorted.into_iter()
+                .map(|x| Value::Integer(x))
+                .collect::<Vec<Value>>();
+            return Ok(Value::List(List::from_cells(new_cells)));
+        },
+        type_1 => {
+            invalid_types(vec!(&type_1), "sort")?;
+        }
+    }
+    Ok(Value::Nil)
+}
+
 //TODO: add function 'shape' which gives the nested size of a nested list like apls shape
-//TODO: add function 'splitat'
 //TODO: add function 'split'
-//TODO: add function intersect

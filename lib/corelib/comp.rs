@@ -168,5 +168,3 @@ pub fn not(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     };
     Ok(Value::Nil)
 }
-
-//TODO: lt, gt, le, ge, ne

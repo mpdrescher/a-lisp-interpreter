@@ -3,7 +3,7 @@ use value::Value;
 use error::Error;
 use stack::Stack;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Lambda {
     param_names: Vec<String>,
     body: List

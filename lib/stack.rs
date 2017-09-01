@@ -2,7 +2,6 @@ use scope::Scope;
 use error::Error;
 use value::Value;
 
-//TODO: DO IT
 #[derive(Debug)]
 pub struct Stack {
     scopes: Vec<Scope>

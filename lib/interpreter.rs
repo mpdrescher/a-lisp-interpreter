@@ -8,10 +8,8 @@ use std::io::Result as IOResult;
 use std::fs::File;
 use stack::Stack;
 
-pub const STD_LIST: [&'static str; 3] = [
+pub const STD_LIST: [&'static str; 1] = [
     "std/basics.ali",
-    "std/assert.ali",
-    "std/simplemath.ali"
 ];
 
 //TODO: change printlns to function return values

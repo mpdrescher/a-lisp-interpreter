@@ -33,7 +33,7 @@ use corelib::program::{
     try,
     type_fn,
     try_rename,
-    format
+    format,
 };
 use corelib::listops::{
     first,
@@ -51,7 +51,13 @@ use corelib::listops::{
     all,
     append,
     unique,
-    contains,
+    find,
+    split_at,
+    combine,
+    intersect,
+    zip,
+    rev,
+    sort
 };
 use corelib::comp::{
     eq,
@@ -117,7 +123,6 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "append" => append(list, stack),
         "unique" => unique(list, stack),
         "expand" => expand(list, stack),
-        "contains" => contains(list, stack),
         "puts" => puts(list, stack),
         "putsln" => putsln(list, stack),
         "throw" => throw(list, stack),
@@ -125,6 +130,13 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "type" => type_fn(list, stack),
         "try_rename" => try_rename(list, stack),
         "format" => format(list, stack),
+        "find" => find(list, stack),
+        "split_at" => split_at(list, stack),
+        "combine" => combine(list, stack),
+        "intersect" => intersect(list, stack),
+        "zip" => zip(list, stack),
+        "rev" => rev(list, stack),
+        "sort" => sort(list, stack),
         _ => {
             return Ok(None)
         }
@@ -167,6 +179,16 @@ pub fn resolve_three_arguments(list: &List, stack: &mut Stack, fn_name: &'static
         resolve(list.cells().get(1).unwrap().clone(), stack, fn_name)?,
         resolve(list.cells().get(2).unwrap().clone(), stack, fn_name)?,
         resolve(list.cells().get(3).unwrap().clone(), stack, fn_name)?
+    ))
+}
+
+pub fn resolve_four_arguments(list: &List, stack: &mut Stack, fn_name: &'static str) -> Result<(Value, Value, Value, Value), Error> {
+    assert_length(list, 4, fn_name)?;
+    Ok((
+        resolve(list.cells().get(1).unwrap().clone(), stack, fn_name)?,
+        resolve(list.cells().get(2).unwrap().clone(), stack, fn_name)?,
+        resolve(list.cells().get(3).unwrap().clone(), stack, fn_name)?,
+        resolve(list.cells().get(4).unwrap().clone(), stack, fn_name)?
     ))
 }
 

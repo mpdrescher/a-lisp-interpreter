@@ -11,7 +11,7 @@ enum Quoted {
     Backquote
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct List {
     cells: Vec<Value>
 }
@@ -202,7 +202,6 @@ impl List {
         })
     }
       
-    //TODO: unwind stack on error for when 'try' is implemented
     pub fn eval(&self, stack: &mut Stack, maybe_params: Option<Vec<(String, Value)>>) -> Result<Value, Error> {
         match maybe_params {
             Some(params) => {

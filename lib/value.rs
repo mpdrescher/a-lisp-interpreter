@@ -11,7 +11,7 @@ use lambda::Lambda;
 
 const NUMBER_CHARS: [char; 14] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '+', '-', 'e'];
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, PartialOrd)]
 pub enum Value {
     Nil,
     List(List),
@@ -115,7 +115,7 @@ impl Value {
             Value::Nil => "nil",
             Value::List(_) => "list",
             Value::Float(_) => "float",
-            Value::Integer(_) => "integer",
+            Value::Integer(_) => "int",
             Value::Symbol(_) => "symbol",
             Value::Lambda(_) => "lambda",
             Value::Boolean(_) => "boolean",
@@ -155,7 +155,7 @@ impl Debug for Value {
                 write!(f, "{} [float]", float)
             },
             &Value::Integer(ref int) => {
-                write!(f, "{} [integer]", int)
+                write!(f, "{} [int]", int)
             },
             &Value::Symbol(ref symbol) => {
                 write!(f, "{} [symbol]", symbol)
