@@ -1,3 +1,4 @@
+use ::FLOAT;
 use list::List;
 use error::Error;
 use functions::{
@@ -16,10 +17,10 @@ pub fn add(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             return Ok(Value::Integer(i_1 + i_2));
         },
         (Value::Integer(i_1), Value::Float(f_2)) => {
-            return Ok(Value::Float(i_1 as f32 + f_2));
+            return Ok(Value::Float(i_1 as FLOAT + f_2));
         },
         (Value::Float(f_1), Value::Integer(i_2)) => {
-            return Ok(Value::Float(f_1 + i_2 as f32));
+            return Ok(Value::Float(f_1 + i_2 as FLOAT));
         },
         (Value::Float(f_1), Value::Float(f_2)) => {
             return Ok(Value::Float(f_1 + f_2));
@@ -38,10 +39,10 @@ pub fn sub(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             return Ok(Value::Integer(i_1 - i_2));
         },
         (Value::Integer(i_1), Value::Float(f_2)) => {
-            return Ok(Value::Float(i_1 as f32 - f_2));
+            return Ok(Value::Float(i_1 as FLOAT - f_2));
         },
         (Value::Float(f_1), Value::Integer(i_2)) => {
-            return Ok(Value::Float(f_1 - i_2 as f32));
+            return Ok(Value::Float(f_1 - i_2 as FLOAT));
         },
         (Value::Float(f_1), Value::Float(f_2)) => {
             return Ok(Value::Float(f_1 - f_2));
@@ -60,10 +61,10 @@ pub fn mul(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             return Ok(Value::Integer(i_1 * i_2));
         },
         (Value::Integer(i_1), Value::Float(f_2)) => {
-            return Ok(Value::Float(i_1 as f32 * f_2));
+            return Ok(Value::Float(i_1 as FLOAT * f_2));
         },
         (Value::Float(f_1), Value::Integer(i_2)) => {
-            return Ok(Value::Float(f_1 * i_2 as f32));
+            return Ok(Value::Float(f_1 * i_2 as FLOAT));
         },
         (Value::Float(f_1), Value::Float(f_2)) => {
             return Ok(Value::Float(f_1 * f_2));
@@ -139,10 +140,10 @@ pub fn modulo(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             return Ok(Value::Integer(i_1 % i_2));
         },
         (Value::Integer(i_1), Value::Float(f_2)) => {
-            return Ok(Value::Float(i_1 as f32 % f_2));
+            return Ok(Value::Float(i_1 as FLOAT % f_2));
         },
         (Value::Float(f_1), Value::Integer(i_2)) => {
-            return Ok(Value::Float(f_1 % i_2 as f32));
+            return Ok(Value::Float(f_1 % i_2 as FLOAT));
         },
         (Value::Float(f_1), Value::Float(f_2)) => {
             return Ok(Value::Float(f_1 % f_2));
@@ -162,7 +163,7 @@ pub fn count(list: &List, stack: &mut Stack) -> Result<Value, Error> {
                 return Err(Error::new_with_origin("count", format!("min ({}) was greater than max ({}).", min, max)));
             }
             let mut result = Vec::with_capacity((max - min) as usize);
-            for i in min..max {
+            for i in min..(max+1) {
                 result.push(Value::Integer(i));
             }
             return Ok(Value::List(List::from_cells(result)));

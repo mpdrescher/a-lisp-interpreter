@@ -1,3 +1,4 @@
+use ::FLOAT;
 use list::List;
 use error::Error;
 use stack::Stack;
@@ -49,10 +50,10 @@ pub fn lt(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             return Ok(Value::Boolean(i_1 < i_2));
         },
         (Value::Integer(i_1), Value::Float(f_2)) => {
-            return Ok(Value::Boolean((i_1 as f32) < f_2));
+            return Ok(Value::Boolean((i_1 as FLOAT) < f_2));
         },
         (Value::Float(f_1), Value::Integer(i_2)) => {
-            return Ok(Value::Boolean(f_1 < i_2 as f32));
+            return Ok(Value::Boolean(f_1 < i_2 as FLOAT));
         },
         (Value::Float(f_1), Value::Float(f_2)) => {
             return Ok(Value::Boolean(f_1 < f_2));
@@ -71,10 +72,10 @@ pub fn gt(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             return Ok(Value::Boolean(i_1 > i_2));
         },
         (Value::Integer(i_1), Value::Float(f_2)) => {
-            return Ok(Value::Boolean(i_1 as f32 > f_2));
+            return Ok(Value::Boolean(i_1 as FLOAT > f_2));
         },
         (Value::Float(f_1), Value::Integer(i_2)) => {
-            return Ok(Value::Boolean(f_1 > i_2 as f32));
+            return Ok(Value::Boolean(f_1 > i_2 as FLOAT));
         },
         (Value::Float(f_1), Value::Float(f_2)) => {
             return Ok(Value::Boolean(f_1 > f_2));
@@ -93,10 +94,10 @@ pub fn le(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             return Ok(Value::Boolean(i_1 <= i_2));
         },
         (Value::Integer(i_1), Value::Float(f_2)) => {
-            return Ok(Value::Boolean(i_1 as f32 <= f_2));
+            return Ok(Value::Boolean(i_1 as FLOAT <= f_2));
         },
         (Value::Float(f_1), Value::Integer(i_2)) => {
-            return Ok(Value::Boolean(f_1 <= i_2 as f32));
+            return Ok(Value::Boolean(f_1 <= i_2 as FLOAT));
         },
         (Value::Float(f_1), Value::Float(f_2)) => {
             return Ok(Value::Boolean(f_1 <= f_2));
@@ -115,10 +116,10 @@ pub fn ge(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             return Ok(Value::Boolean(i_1 >= i_2));
         },
         (Value::Integer(i_1), Value::Float(f_2)) => {
-            return Ok(Value::Boolean(i_1 as f32 >= f_2));
+            return Ok(Value::Boolean(i_1 as FLOAT >= f_2));
         },
         (Value::Float(f_1), Value::Integer(i_2)) => {
-            return Ok(Value::Boolean(f_1 >= i_2 as f32));
+            return Ok(Value::Boolean(f_1 >= i_2 as FLOAT));
         },
         (Value::Float(f_1), Value::Float(f_2)) => {
             return Ok(Value::Boolean(f_1 >= f_2));

@@ -1,5 +1,6 @@
 use std::collections::BTreeSet;
 
+use ::INT;
 use list::List;
 use error::Error;
 use functions::invalid_types;
@@ -89,7 +90,7 @@ pub fn len(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "len")?;
     match op_1 {
         Value::List(list) => {
-            return Ok(Value::Integer(list.cells().len() as i32));
+            return Ok(Value::Integer(list.cells().len() as INT));
         },
         type_1 => {
             invalid_types(vec!(&type_1), "len")?;
@@ -105,7 +106,7 @@ pub fn nth(list: &List, stack: &mut Stack) -> Result<Value, Error> {
             if index < 0 {
                 return Err(Error::new_with_origin("nth", format!("index must be non-negative.")));
             }
-            else if list.cells().len() == 0 || index >= list.cells().len() as i32 { //TODO: rethink this
+            else if list.cells().len() == 0 || index >= list.cells().len() as INT { //TODO: rethink this
                 return Ok(Value::Nil);
             }
             return Ok(list.cells().get(index as usize).unwrap().clone());
@@ -337,7 +338,7 @@ pub fn split_at(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let (op_1, op_2) = resolve_two_arguments(list, stack, "split_at")?;
     match (op_1, op_2) {
         (Value::Integer(int_32), Value::List(list)) => {
-            if 0 <= int_32 && int_32 <= (list.cells().len() - 1) as i32 {
+            if 0 <= int_32 && int_32 <= (list.cells().len() - 1) as INT {
                 let int = int_32 as usize;
                 let cells = list.into_cells();
                 let (l1, l2) = cells.split_at(int);

@@ -5,6 +5,8 @@ use std::fmt::{
 use std::fmt::Result as FmtResult;
 use std::fmt::Formatter;
 
+use ::FLOAT;
+use ::INT;
 use error::Error;
 use list::List;
 use lambda::Lambda;
@@ -15,8 +17,8 @@ const NUMBER_CHARS: [char; 14] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '
 pub enum Value {
     Nil,
     List(List),
-    Float(f32),
-    Integer(i32),
+    Float(FLOAT),
+    Integer(INT),
     Symbol(String),
     Lambda(Lambda),
     Boolean(bool),
@@ -37,7 +39,7 @@ impl Value {
         else if is_numeric(&code) {
             let dot_count = code.chars().filter(|x| *x == '.').count();
             if dot_count == 1 {
-                match code.parse::<f32>() {
+                match code.parse::<FLOAT>() {
                     Ok(float) => {
                         Value::Float(float)
                     },
@@ -47,7 +49,7 @@ impl Value {
                 }
             }
             else if dot_count == 0 {
-                match code.parse::<i32>() {
+                match code.parse::<INT>() {
                     Ok(int) => {
                         Value::Integer(int)
                     },

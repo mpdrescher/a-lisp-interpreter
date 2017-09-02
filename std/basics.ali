@@ -3,8 +3,8 @@
 ))
 
 (defun 'if '(condition result alt) '(
-    cond '(`condition result)
-         '(true alt)
+    cond '(`condition (eval result))
+         '(true (eval alt))
 ))
 
 (defun 'sum '(x) '(fold 0 (|acc x| + acc x) x))
@@ -41,4 +41,15 @@
 (defun '-- '(name) '(decassign name))
 
 (defun 'contains '(list value) '(ne (find value list) -1))
+
 (defun 'union '(list1 list2) '(unique (append list1 list2)))
+
+(defun 'factorial '(n) '(if (eq n 0) 1 '(product (count 1 n))))
+
+(defun 'ncr '(n r) '(
+    seq
+    (if (ge n r) nil '(throw "n is smaller than r"))
+    (div (factorial n) (mul (factorial (sub n r)) (factorial r)))
+))
+
+(defun 'print2d '(x) '(seq (% (|elem| print elem) x) 'nil))

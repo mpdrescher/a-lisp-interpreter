@@ -3,6 +3,7 @@ use list::resolve;
 use error::Error;
 use value::Value;
 use stack::Stack;
+use ::FLOAT;
 
 use corelib::math::{
     add,
@@ -111,8 +112,8 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "fold" | "\\" => fold(list, stack),
         "any" => any(list, stack),
         "all" => all(list, stack),
-        "filter" => filter(list, stack),
-        "count" => count(list, stack),
+        "filter" | "_" => filter(list, stack),
+        "count" | ".." => count(list, stack),
         "mod" => modulo(list, stack),
         "and" => and(list, stack),
         "or" => or(list, stack),
@@ -208,9 +209,9 @@ pub fn assert_length(list: &List, length: usize, fn_name: &'static str) -> Resul
     return Ok(())
 }
 
-pub fn to_float(value: Value) -> Option<f32> {
+pub fn to_float(value: Value) -> Option<FLOAT> {
     match value {
-        Value::Integer(i) => Some(i as f32),
+        Value::Integer(i) => Some(i as FLOAT),
         Value::Float(f) => Some(f),
         _ => None
     }
