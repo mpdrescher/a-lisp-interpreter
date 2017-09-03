@@ -37,7 +37,6 @@ use corelib::program::{
     format,
 };
 use corelib::listops::{
-    first,
     last,
     init,
     tail,
@@ -92,7 +91,6 @@ pub fn eval(list: &List, stack: &mut Stack) -> Result<Option<Value>, Error> {
         "sin" => sin(list, stack),
         "cos" => cos(list, stack),
         "tan" => tan(list, stack),
-        "first" => first(list, stack),
         "last" => last(list, stack),
         "init" => init(list, stack),
         "tail" => tail(list, stack),

@@ -10,24 +10,6 @@ use functions::resolve_three_arguments;
 use value::Value;
 use stack::Stack;
 
-pub fn first(list: &List, stack: &mut Stack) -> Result<Value, Error> {
-    let op_1 = resolve_argument(list, stack, "first")?;
-    match op_1 {
-        Value::List(list) => {
-            if list.cells().len() > 0 {
-                return Ok(list.cells().get(0).unwrap().clone());
-            }
-            else {
-                return Ok(Value::Nil);
-            }
-        },
-        type_1 => {
-            invalid_types(vec!(&type_1), "first")?;
-        }
-    }
-    Ok(Value::Nil)
-}
-
 pub fn last(list: &List, stack: &mut Stack) -> Result<Value, Error> {
     let op_1 = resolve_argument(list, stack, "last")?;
     match op_1 {

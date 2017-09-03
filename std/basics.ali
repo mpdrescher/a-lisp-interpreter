@@ -1,3 +1,10 @@
+@function defun
+@returns 
+    nil
+@arguments
+    name [symbol]: the name of the function;
+    params [list]: the parameters of the function;
+    fn [list]: the function body
 (set 'defun (
     |name params fn| (global name (lambda params (cons 'try_rename (cons fn (cons (cons 'quote (cons name '())) '())))))
 ))
@@ -53,3 +60,11 @@
 ))
 
 (defun 'print2d '(x) '(seq (% (|elem| print elem) x) 'nil))
+
+(defun 'ez '(x) '(if (eq x 0) true false))
+
+(defun 'nz '(x) '(if (eq x 0) false true))
+
+(defun 'fst '(x) '(nth 0 x))
+(defun 'snd '(x) '(nth 1 x))
+(defun 'thd '(x) '(nth 2 x))

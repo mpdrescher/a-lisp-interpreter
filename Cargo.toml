@@ -11,6 +11,10 @@ path = "lib/lib.rs"
 name = "ali"
 path = "src/main.rs"
 
+[[bin]]
+name = "doctool"
+path = "doctool/main.rs"
+
 [dependencies]
 rustyline = "*"
 sdl2 = "*"
