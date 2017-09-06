@@ -273,7 +273,7 @@ impl List {
                     }
                 };
                 let param_count = self.cells.len() - 1;
-                if param_count != lambda.param_count() {
+                if param_count > lambda.param_count() || (lambda.param_count() != 0 && param_count == 0) {
                     stack.pop();
                     return Err(Error::new(format!("'{}': expected {} function parameters, found {}.", name, lambda.param_count(), param_count)));
                 }
