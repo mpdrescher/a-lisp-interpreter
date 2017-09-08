@@ -1,4 +1,12 @@
-There is a lot to be done, but here is a quick example:
+## a-lisp-interpreter
+
+A list of builtin functions can be found at:  
+- [core documentation](https://github.com/mpdrescher/a-lisp-interpreter/blob/master/doc/core.alidoc)
+- [std documentation](https://github.com/mpdrescher/a-lisp-interpreter/blob/master/doc/basics.alidoc)  
+  
+Core functions are hardcoded (either because they are atomic, provide OS-Interfaces or have a better performance [esp. for list operations]), std functions are loaded by the interpreter upon startup.
+
+### Example (using an older version):
 
 ```
 == A Lisp Interpreter ==

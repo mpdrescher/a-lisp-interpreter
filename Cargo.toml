@@ -17,4 +17,3 @@ path = "doctool/main.rs"
 
 [dependencies]
 rustyline = "*"
-sdl2 = "*"

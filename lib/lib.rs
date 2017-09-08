@@ -1,5 +1,3 @@
-extern crate sdl2;
-
 pub mod corelib;
 pub mod error;
 pub mod functions;
