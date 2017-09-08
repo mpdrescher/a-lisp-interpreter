@@ -4,6 +4,7 @@ use std::io::Read;
 use std::io::Error as IOError;
 
 mod plainformat;
+mod htmlformat;
 
 fn main() {
     let args = env::args().skip(1).collect::<Vec<String>>();
@@ -13,7 +14,11 @@ fn main() {
         println!("usage: doctool [files...]");
         return;
     }
+    let mut htmlformatter = false;
     for filepath in args {
+        if filepath == "--html" {
+            htmlformatter = true;
+        }
         let content = match read_file(filepath.clone()) {
             Ok(v) => v,
             Err(err) => {
@@ -31,7 +36,10 @@ fn main() {
         units.append(&mut cur_units);
     }
     // println!("{:#?}", units);
-    plainformat::print_units(units);
+    match htmlformatter {
+        true => htmlformat::print_units(units),
+        false => plainformat::print_units(units)
+    }
 }
 
 fn read_file(path: String) -> Result<String, IOError> {

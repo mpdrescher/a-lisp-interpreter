@@ -9,26 +9,70 @@
     |name params fn| (global name (lambda params (cons 'try_rename (cons fn (cons (cons 'quote (cons name '())) '())))))
 ))
 
+@function if
+@arguments
+    condition [bool]: a condition;
+    result [any]: the value that is returned when condition is true;
+    alt [any]: the value that is returned when condition is false
+@returns
+    any: either result or alt
 (defun 'if '(condition result alt) '(
     cond '(`condition (eval result))
          '(true (eval alt))
 ))
 
+@function sum
+@arguments
+    list: a list of numbers that can be added by +
+@returns
+    number: the sum of the elements in list
 (defun 'sum '(x) '(fold 0 (|acc x| + acc x) x))
 
+@function product
+@arguments
+    list: a list of numbers that can be multiplied by *
+@returns
+    number: the product of the elements in list
 (defun 'product '(x) '(fold 1 (|acc x| * acc x) x))
 
+@function dec
+@arguments
+    x [number]
+@returns
+    number: x + 1
 (defun 'inc '(x) '(+ x 1))
 
+@function inc
+@arguments
+    x [number]
+@returns
+    number: x - 1
 (defun 'dec '(x) '(- x 1))
 
+@function avg
+@arguments
+    list: a list of numbers
+@returns
+    number: the average value of the elements of the argument
 (defun 'avg '(x) '(/ (sum x) (len x)))
 
+@function min
+@arguments
+    a [number];
+    b [number]
+@returns
+    number: a, if a < b, else b
 (defun 'min '(x y) '(
     cond '((lt x y) x)
     '(true y)
 ))
 
+@function max
+@arguments
+    a [number];
+    b [number]
+@returns
+    number: a, if a > b, else b
 (defun 'max '(x y) '(
     cond '((gt x y) x)
     '(true y)
@@ -47,24 +91,83 @@
 (defun '++ '(name) '(incassign name))
 (defun '-- '(name) '(decassign name))
 
+@function contains
+@arguments
+    list;
+    value [any]
+@returns
+    bool: true, if value is element of the list, else false
 (defun 'contains '(list value) '(ne (find value list) -1))
 
+@function union
+@arguments
+    a [list];
+    b [list]
+@returns
+    list: a list of values that are both element of a and b
 (defun 'union '(list1 list2) '(unique (append list1 list2)))
 
+@function factorial
+@arguments
+    n [int]
+@returns
+    number: the value of n!
 (defun 'factorial '(n) '(if (eq n 0) 1 '(product (count 1 n))))
 
+@function ncr
+@arguments
+    n [int];
+    r [int]
+@returns
+    int: r out of n. (n! / (n-r)!*k!)
+@throws
+    when n is smaller than r
 (defun 'ncr '(n r) '(
     seq
     (if (ge n r) nil '(throw "n is smaller than r"))
     (div (factorial n) (mul (factorial (sub n r)) (factorial r)))
 ))
 
+@function print2d
+@description
+    Prints out each list item in a new line.
+@arguments
+    list
+@returns
+    nil
 (defun 'print2d '(x) '(seq (% (|elem| print elem) x) 'nil))
 
+@function ez
+@arguments
+    x [int]
+@returns
+    bool: true, if x equals 0, false otherwise
 (defun 'ez '(x) '(if (eq x 0) true false))
 
+@function nz
+@arguments
+    x [int]
+@returns
+    bool: true, if x does not equal 0, false otherwise
 (defun 'nz '(x) '(if (eq x 0) false true))
 
+@function fst
+@arguments
+    list
+@returns
+    any: the first element of the list
 (defun 'fst '(x) '(nth 0 x))
+
+@function snd
+@arguments
+    list
+@returns
+    any: the second element of the list
 (defun 'snd '(x) '(nth 1 x))
+
+@function thd
+@arguments
+    list
+@returns
+    any: the third element of the list
 (defun 'thd '(x) '(nth 2 x))
