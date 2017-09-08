@@ -119,7 +119,7 @@
     n [int];
     r [int]
 @returns
-    int: r out of n. (n! / (n-r)!*k!)
+    int: r out of n -> n! / [n-r]!*k!
 @throws
     when n is smaller than r
 (defun 'ncr '(n r) '(

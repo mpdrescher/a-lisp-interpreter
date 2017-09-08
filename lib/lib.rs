@@ -10,5 +10,5 @@ pub mod scope;
 pub mod value;
 pub mod stack;
 
-pub type FLOAT = f32;
-pub type INT = i32;
+pub type FLOAT = f64;
+pub type INT = i64;

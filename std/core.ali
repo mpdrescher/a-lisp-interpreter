@@ -1,0 +1,164 @@
+@function lambda
+@arguments
+    list: the parameter list;
+    list: the lambda body
+@returns
+    lambda
+(quote 'dummy)
+
+@function cond
+@arguments
+    list...: multiple lists with two elements -> [bool cond, any value]
+@returns
+    any: the value of the first list where cond is true
+@throws
+    when all conditions are false;
+    when the parent list contains not only lists;
+    when a child list does not contain two elements;
+    when a child list does not have a boolean as its first element
+(quote 'dummy)
+
+@function set
+@description
+    Binds a value to a name -> sets a variable
+@arguments
+    symbol: the name of the variable;
+    any: a value
+@returns
+    nil
+(quote 'dummy)
+
+@function global
+@description
+    Binds a value to a name in the global scope -> sets a global variable
+@arguments
+    symbol: the name of the variable;
+    any: a value
+@returns
+    nil
+(quote 'dummy)
+
+@function quote
+@arguments
+    any: an object
+@returns
+    the unevaluated object
+(quote 'dummy)
+
+@function eval
+@arguments
+    any: an object
+@returns
+    the evaluation result of the object
+@throws
+    when the evaluation fails
+(quote 'dummy)
+
+@function printfmt
+@description
+    prints the object, its elements [if any] and its type
+@arguments
+    any
+@returns
+    nil
+(quote 'dummy)
+
+@function print
+@description
+    prints the object and its elements [if any]
+@arguments
+    any
+@returns
+    nil
+(quote 'dummy)
+
+@function while
+@description
+    evaluates the body while the head returns true
+@arguments
+    list: head;
+    list: body
+@returns
+    any: the last evaluation result of the body
+@throws
+    when the head does not evaluate to bool
+(quote 'dummy)
+
+@function spawn
+@description
+    spawns a thread for the evaluation of each parameter
+@arguments
+    any...
+@returns
+    list: a list of the evaluation results [in the same order as the parameters]
+@throws
+    when the evaluation of any parameter fails
+(quote 'dummy)
+
+@function puts
+@description
+    displays the given string without trailing newline
+@arguments
+    list: a string
+@returns
+    nil
+@throws
+    when the list is not a string [a pure character list]
+(quote 'dummy)
+
+@function putsln
+@description
+    displays the given string with trailing newline
+@arguments
+    list: a string
+@returns
+    nil
+@throws
+    when the list is not a string [a pure character list]
+(quote 'dummy)
+
+@function seq
+@description
+    evaluates all parameters in the given order
+@arguments
+    any...: usually a list that has to be evaluated
+@returns
+    any: the last evaluation result
+(quote 'dummy)
+
+@function throw
+@arguments
+    list: a string
+@returns
+    --
+@throws
+    always: the given string is the error message
+(quote 'dummy)
+
+@function try
+@arguments
+    body [any];
+    alternative
+@returns
+    any: the evaluation result of body, or alternative on error
+(quote 'dummy)
+
+@function type
+@arguments
+    any
+@returns
+    symbol: the type of the parameter
+(quote 'dummy)
+
+@function format
+@description
+    replaces each occurrence of '$$' in the string with the matching parameter
+@arguments
+    list: the formatting string;
+    any...: the formatting arguments
+@returns
+    list: a formatted string
+@throws
+    when the argument count does not matching;
+    when the list is not a string [a pure list of characters]
+(quote 'dummy)
